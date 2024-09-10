@@ -7,8 +7,8 @@ import { MdAccountCircle } from 'react-icons/md';
 
 const panels = [
   {
-    name: 'Create Ticket',
-    link: '/dashboard#Create',
+    name: 'Create User',
+    link: '/dashboard#CreateUser',
     icon: <IoCreateSharp className=" text-4xl font-medium" />
   },
   {
@@ -17,11 +17,16 @@ const panels = [
     icon: <IoTicketSharp className=" text-4xl font-medium" />,
   },
   {
-    name: 'Upload Bulk Tickets',
-    link: '/dashboard#Import',
-    icon: <IoAddCircleSharp className="text-4xl font-medium" />
-    
+    name: 'Create Ticket',
+    link: '/dashboard#Create',
+    icon: <IoCreateSharp className=" text-4xl font-medium" />
   },
+  // {
+  //   name: 'Upload Bulk Tickets',
+  //   link: '/dashboard#Import',
+  //   icon: <IoAddCircleSharp className="text-4xl font-medium" />
+    
+  // },
   {
     name: 'Calendar',
     link: '/dashboard#Calendar',

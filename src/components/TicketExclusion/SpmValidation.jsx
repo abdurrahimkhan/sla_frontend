@@ -157,7 +157,7 @@ export default function SpmValidation({ ticket_number, Exclusion_Reason, request
               <div>
                 <span className='font-medium'>Return to Requester</span>
               </div>
-              <button onClick={returnTicket} className='bg-stc-green shadow-lg text-white py-2 px-3 rounded-md'>Submit</button>
+              <button onClick={returnTicket} className='bg-stc-red shadow-lg text-white py-2 px-3 rounded-md'>Return</button>
             </FlexDiv>
 
             <FlexDiv justify='space-between' classes='border-b border-stc-black'>
@@ -167,7 +167,7 @@ export default function SpmValidation({ ticket_number, Exclusion_Reason, request
 
             <FlexDiv justify='space-between' classes='border-b border-stc-black'>
               <span className='font-medium'>Exclusion Reason</span>
-              <select id="my-dropdown" value={selectedExclusionReason} onChange={handleChange} className='focus:outline-none border border-slate-400 px-2 py-1 border-opacity-40 rounded-sm '>
+              <select id="my-dropdown" value={selectedExclusionReason} onChange={handleChange} className='focus:outline-none border max-w-[260px] w-full border-slate-400 px-2 py-1 border-opacity-40 rounded-sm '>
                 <option value="" disabled>Select one</option>
                 {exclusionReasons.map((exclusionReason) => (
                   <option key={exclusionReason.id} value={exclusionReason.value}>
