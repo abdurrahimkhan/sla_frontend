@@ -9,6 +9,7 @@ import SuccessResults from '../../Common/SuccessResult'
 import { BASE_URL, CONTRACTOR } from '../../../constants/constants'
 import { useNavigate } from 'react-router-dom';
 import { Multiselect } from "multiselect-react-dropdown";
+import SuccessModal from '../../Common/SuccessModal'
 
 
 
@@ -16,6 +17,8 @@ import { Multiselect } from "multiselect-react-dropdown";
 export default function UserForm() {
   const [permissionsList, setPermissionsList] = React.useState([]);
   const [selectedPermissionsList, setSelectedPermissionsList] = React.useState([]);
+  const [status, setStatus] = React.useState(0);
+  const [errorMessage, setErrorMessage] = React.useState('')
 
   const [name, setName] = React.useState('');
   const [rank, setRank] = React.useState('');
@@ -75,55 +78,54 @@ export default function UserForm() {
 
   const handleSubmission = async () => {
 
-    if (name === '' || mobileNumber === null || email === '' || exclusionRemarks === '') {
+    if (name === '' || mobileNumber === null || email === '' || permissionsList.length == 0 || rank === '') {
       setError('Please fill all the fields.')
       setOpen(true)
       return
     }
-    // else if (ticketNumber.length < 13 || ticketNumber.startsWith('PR') === false) {
-    //   setError('Invalid Ticket Number');
-    //   setOpen(true)
-    //   return;
-    // } else if (exclusionHours < 0) {
-    //   setError('Exclusion Hours cannot be negative.')
-    //   setOpen(true)
-    //   return
-    // }
     else {
-      setLoading(true)
-      try {
-        const res = await axios.post('/api/ticket/create', null, {
-          params: {
-            name: name,
-            // exclusionHours: exclusionHours,
-            // exclusionReason: exclusionReason,
-            // exclusionRemarks: exclusionRemarks,
-            // restorationDuration: restorationDuration,
-            // contractorHubtime: contractorHubtime,
-            // requestType: requestType,
-            createTicket: 'yes'
-          }
-        });
-        console.log(res)
-        setError(null)
-        setLoading(false)
-        setSuccess(true)
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          setError(error.response?.data)
-          setErrorResult(true)
-          setLoading(false)
-        } else {
-          setError('Something went wrong!')
-          setErrorResult(true)
-          setLoading(false)
+      setLoading(true);
+      let config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: `${BASE_URL}/user-request/create`,
+        headers: {
+          'Authorization': storedSession.Authorization,
+          'Content-Type': 'application/json'
+        },
+        data: {
+          name: name,
+          email: email,
+          mobileNumber : mobileNumber,
+          parentUser : parentUser,
+          permissionList: permissionsList,
+          rank: rank,
+          stc_employee: isSTC
         }
-
-      } finally {
-        setName('');
-        setMobileNumber('');
-        isSTC(false);
-      }
+      };
+      axios.request(config)
+        .then((response) => {
+          console.log(JSON.stringify(response.data));
+          setStatus(200);
+        })
+        .catch((error) => {
+          console.log(error);
+          if (axios.isAxiosError(error)) {
+            setErrorMessage(error.response?.data)
+            setErrorResult(true)
+            setLoading(false)
+          } else {
+            setErrorMessage('Something went wrong!')
+            setErrorResult(true)
+            setLoading(false)
+          }
+        })
+        .finally(() => {
+          setLoading(false);
+          setName('');
+          setMobileNumber('');
+          isSTC(false);
+        });
     }
   }
 
@@ -137,6 +139,10 @@ export default function UserForm() {
     setSelectedPermissionsList(selectedIds); // Store the updated list of ids
   };
 
+  const handleCheckboxChange = (e) => {
+    setIsSTC(e.target.checked); // Set the value to true when checked, false when unchecked
+  };
+
 
   if (loading) {
     return (
@@ -146,101 +152,107 @@ export default function UserForm() {
     )
   }
   return (
-    <FlexDiv direction='column' alignment='start' classes='form-body p-14'>
-      <span className='text-xl font font-semibold text-stc-purple'>
-        User Detail Form
-      </span>
+    <>
+      <FlexDiv direction='column' alignment='start' classes='form-body p-14'>
+        <span className='text-xl font font-semibold text-stc-purple'>
+          User Detail Form
+        </span>
 
-      {errorResult ?
-        <FlexDiv classes='mt-20'>
-          <ErrorResult text={error} onClick={() => setErrorResult(false)} />
-        </FlexDiv>
-        :
-        success ?
+        {errorResult ?
           <FlexDiv classes='mt-20'>
-            <SuccessResults text={'User Created Successfully'} onClick={() => setSuccess(false)} />
+            <ErrorResult text={error} onClick={() => setErrorResult(false)} />
           </FlexDiv>
           :
-          <React.Fragment>
-
-            <FlexDiv gapX={20}>
-              <InputContainer label='Name' required={true}>
-                <input
-                  onChange={(e) => setName(e.target.value)}
-                  type='text' placeholder='Enter Name' className='w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3 pl-4' />
-              </InputContainer>
-
-              <InputContainer label='Email' required={true}>
-                <input
-                  onChange={(e) => setEmail(e.target.value)}
-                  type='text' placeholder='Enter Email' className='w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3 pl-4' />
-              </InputContainer>
-
+          success ?
+            <FlexDiv classes='mt-20'>
+              <SuccessResults text={'User Created Successfully'} onClick={() => setSuccess(false)} />
             </FlexDiv>
+            :
+            <React.Fragment>
 
-            <FlexDiv gapX={20}>
-              <InputContainer label='Mobile Number' required={true}>
-                <input
-                  onChange={(e) => setMobileNumber(e.target.value)}
-                  type='text' placeholder='Enter Mobile' className='w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3 pl-4' />
-              </InputContainer>
+              <FlexDiv gapX={20}>
+                <InputContainer label='Name' required={true}>
+                  <input
+                    onChange={(e) => setName(e.target.value)}
+                    type='text' placeholder='Enter Name' className='w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3 pl-4' />
+                </InputContainer>
 
-              <InputContainer label='Parent User' required={true}>
-                <input
-                  type='text' disabled defaultValue={parentUser} className='w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3 pl-4' />
-              </InputContainer>
+                <InputContainer label='Email' required={true}>
+                  <input
+                    onChange={(e) => setEmail(e.target.value)}
+                    type='text' placeholder='Enter Email' className='w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3 pl-4' />
+                </InputContainer>
 
-            </FlexDiv>
+              </FlexDiv>
 
+              <FlexDiv gapX={20}>
+                <InputContainer label='Mobile Number' required={true}>
+                  <input
+                    onChange={(e) => setMobileNumber(e.target.value)}
+                    type='text' placeholder='Enter Mobile' className='w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3 pl-4' />
+                </InputContainer>
 
-            <FlexDiv>
-              <InputContainer label="Permission List" required={true}>
-                {/* MultiSelect dropdown */}
-                <Multiselect style={'w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3 pl-4'}
-                  options={permissionsList} // Options to display in the dropdown
-                  selectedValues={permissionsList.filter((permission) =>
-                    selectedPermissionsList.includes(permission.id))} // Preselected values by matching ids
-                  onSelect={handleSelect} // Function to handle selected values
-                  onRemove={handleRemove} // Function to handle removed values
-                  displayValue="displayName" // Property name to display in the dropdown
-                  // customDisplay={(permission) => `${permission.name} (${permission.level})`}
-                  placeholder="Select Permissions"
-                />
-              </InputContainer>
-            </FlexDiv>
+                <InputContainer label='Parent User' required={true}>
+                  <input
+                    type='text' disabled defaultValue={parentUser} className='w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3 pl-4' />
+                </InputContainer>
 
-            <FlexDiv gapX={20}>
-            <InputContainer label='Rank' required={true}>
-                <input
-                  onChange={(e) => setRank(e.target.value)}
-                  type='text' placeholder='Enter Rank' className='w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3 pl-4' />
-              </InputContainer>
-
-              <InputContainer label='STC Employee' required={true}>
-                <input
-                  onChange={(e) => setIsSTC(e.target.value)}
-                  type='checkbox' placeholder='Enter Mobile' className='w-10 mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3' />
-              </InputContainer>
-            </FlexDiv>
-
-            {
-              error &&
-              <ErrorModal open={open} heading='Error' body={error} close={() => setOpen(false)} />
-            }
+              </FlexDiv>
 
 
-            <FlexDiv justify='end' classes='mt-5' gapX={20}>
-              <button type='button' className='bg-stc-black text-white px-5 py-2 rounded-md'>
+              <FlexDiv>
+                <InputContainer label="Permission List" required={true}>
+                  {/* MultiSelect dropdown */}
+                  <Multiselect style={'w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3 pl-4'}
+                    options={permissionsList} // Options to display in the dropdown
+                    selectedValues={permissionsList.filter((permission) =>
+                      selectedPermissionsList.includes(permission.id))} // Preselected values by matching ids
+                    onSelect={handleSelect} // Function to handle selected values
+                    onRemove={handleRemove} // Function to handle removed values
+                    displayValue="displayName" // Property name to display in the dropdown
+                    // customDisplay={(permission) => `${permission.name} (${permission.level})`}
+                    placeholder="Select Permissions"
+                  />
+                </InputContainer>
+              </FlexDiv>
+
+              <FlexDiv gapX={20}>
+                <InputContainer label='Rank' required={true}>
+                  <input
+                    onChange={(e) => setRank(e.target.value)}
+                    type='text' placeholder='Enter Rank' className='w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3 pl-4' />
+                </InputContainer>
+
+                <InputContainer label='STC Employee' required={true}>
+                  <input
+                    onChange={handleCheckboxChange}
+                    type='checkbox' checked={isSTC} className="w-10 mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3"/>
+                </InputContainer>
+              </FlexDiv>
+
+              {
+                error &&
+                <ErrorModal open={open} heading='Error' body={error} close={() => setOpen(false)} />
+              }
+
+
+              <FlexDiv justify='end' classes='mt-5' gapX={20}>
+                {/* <button type='button' className='bg-stc-black text-white px-5 py-2 rounded-md'>
                 Preview
-              </button>
-              <button
-                onClick={handleSubmission}
-                type='button' className='bg-stc-purple text-white px-5 py-2 rounded-md'>
-                Submit without Preview
-              </button>
-            </FlexDiv>
-          </React.Fragment>
-      }
-    </FlexDiv>
+              </button> */}
+                <button
+                  onClick={handleSubmission}
+                  type='button' className='bg-stc-purple text-white px-5 py-2 rounded-md'>
+                  Submit without Preview
+                </button>
+              </FlexDiv>
+            </React.Fragment>
+        }
+      </FlexDiv>
+      {status === 200 && <SuccessModal heading='Success' body={'Response submitted successfully'} open={status === 200} close={() => window.location.href = '/dashboard#Home'} />}
+
+      {status === 500 && <ErrorModal heading='Something went wrong!' body={errorMessage} open={status === 500} close={() => setStatus(0)} />}
+    </>
+
   )
 }
