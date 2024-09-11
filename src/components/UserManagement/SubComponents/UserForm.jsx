@@ -24,16 +24,12 @@ export default function UserForm() {
   const [rank, setRank] = React.useState('');
   const [mobileNumber, setMobileNumber] = React.useState('');
   const [isSTC, setIsSTC] = React.useState(false);
-  const [restorationDuration, setRestorationDuration] = React.useState(0.0)
-  const [contractorHubtime, setcontractorHubtime] = React.useState(0.0)
   const [email, setEmail] = React.useState('');
-  const [exclusionRemarks, setExclusionRemarks] = React.useState('')
   const [error, setError] = React.useState(null)
   const [open, setOpen] = React.useState(false)
   const [success, setSuccess] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [errorResult, setErrorResult] = React.useState(false);
-  const [requestType, setRequestType] = React.useState('MTTR Request')
   const storedSession = JSON.parse(localStorage.getItem('session'));
   const [parentUser, setParentUser] = React.useState(storedSession.user.email);
   const navigate = useNavigate();
@@ -98,15 +94,20 @@ export default function UserForm() {
           email: email,
           mobileNumber : mobileNumber,
           parentUser : parentUser,
-          permissionList: permissionsList,
+          permissionList: selectedPermissionsList,
           rank: rank,
           stc_employee: isSTC
         }
       };
+
+      console.log("checking sending data");
+      
+      console.log(config.data);
+      
       axios.request(config)
         .then((response) => {
-          console.log(JSON.stringify(response.data));
-          setStatus(200);
+          console.log(JSON.stringify(response));
+          setStatus(response.status);
         })
         .catch((error) => {
           console.log(error);
@@ -124,7 +125,7 @@ export default function UserForm() {
           setLoading(false);
           setName('');
           setMobileNumber('');
-          isSTC(false);
+          setIsSTC(false);
         });
     }
   }
@@ -249,7 +250,7 @@ export default function UserForm() {
             </React.Fragment>
         }
       </FlexDiv>
-      {status === 200 && <SuccessModal heading='Success' body={'Response submitted successfully'} open={status === 200} close={() => window.location.href = '/dashboard#Home'} />}
+      {status === 200 && <SuccessModal heading='Success' body={'User Created successfully'} open={status === 200} close={() => window.location.href = '/dashboard#Home'} />}
 
       {status === 500 && <ErrorModal heading='Something went wrong!' body={errorMessage} open={status === 500} close={() => setStatus(0)} />}
     </>
