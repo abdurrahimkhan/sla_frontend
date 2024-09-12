@@ -16,6 +16,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MiddlewareProvider from '../Middleware/AuthMiddleware';
 import CreateUser from '../components/UserManagement/CreateUser';
+import UserProfile from '../components/UserManagement/UserProfile';
 
 
 const tabs = [
@@ -54,6 +55,10 @@ const tabs = [
     {
         name: 'CreateUser',
         component: <CreateUser />
+    },
+    {
+        name: 'Profile',
+        component: <UserProfile />
     },
     {
         name: 'Import',
