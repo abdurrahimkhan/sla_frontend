@@ -72,7 +72,7 @@ const tabs = [
 ];
 
 export default function Dashboard() {
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [activeTab, setActiveTab] = useState(tabs[0].name);
     // const router = useRouter();
     // const { session, status, signIn, signOut } = useAuth();

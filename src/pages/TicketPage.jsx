@@ -15,7 +15,7 @@ import { CONTRACTOR, BASE_URL } from '../constants/constants';
 // import { UPDATE_PERMISSIONS } from '../lib/permissions';
 import axios from 'axios';
 import React, { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import HuaDepartment from '../components/TicketExclusion/HuaDepartment';
 import SpocValidationForm from '../components/TicketExclusion/SpocValidation';
 import SpmValidation from '../components/TicketExclusion/SpmValidation';
@@ -34,6 +34,8 @@ export default function TicketPage() {
     const [user, setUser] = useState();
     const navigate = useNavigate();
     const { pr_id } = useParams();
+    const [searchParams] = useSearchParams();
+    const source = searchParams.get('source');
 
 
 
@@ -130,21 +132,35 @@ export default function TicketPage() {
                         </div>
                         <div className='w-[40%]  flex flex-col gap-y-10'>
 
-                            {
-                                ticket &&
-                                    ticket?.Exclusion_Status === 'SPOC Validation' ?
-                                    <CollapseComponent headerText='SPOC Validation'>
-                                        <SpocValidationForm ticket_number={ticket?.PR_ID} Exclusion_Reason={ticket?.Exclusion_Reason} Huawei_Remarks={ticket?.Huawei_Remarks} requested_hours={ticket?.Exclusion_Time} />
-                                    </CollapseComponent> : null
-                            }
+                            {source === 'pending' ? (
+                                <>
+                                    {
+                                        ticket && ticket?.Exclusion_Status === 'SPOC Validation' ? (
+                                            <CollapseComponent headerText='SPOC Validation'>
+                                                <SpocValidationForm
+                                                    ticket_number={ticket?.PR_ID}
+                                                    Exclusion_Reason={ticket?.Exclusion_Reason}
+                                                    Huawei_Remarks={ticket?.Huawei_Remarks}
+                                                    requested_hours={ticket?.Exclusion_Time}
+                                                />
+                                            </CollapseComponent>
+                                        ) : null
+                                    }
 
-                            {
-                                ticket &&
-                                    ticket?.Exclusion_Status === 'SPM Validation' ?
-                                    <CollapseComponent headerText='SPM Validation'>
-                                        <SpmValidation ticket_number={ticket?.PR_ID} Exclusion_Reason={ticket?.Exclusion_Reason} Huawei_Remarks={ticket?.Huawei_Remarks} requested_hours={ticket?.Exclusion_Time} />
-                                    </CollapseComponent> : null
-                            }
+                                    {
+                                        ticket && ticket?.Exclusion_Status === 'SPM Validation' ? (
+                                            <CollapseComponent headerText='SPM Validation'>
+                                                <SpmValidation
+                                                    ticket_number={ticket?.PR_ID}
+                                                    Exclusion_Reason={ticket?.Exclusion_Reason}
+                                                    Huawei_Remarks={ticket?.Huawei_Remarks}
+                                                    requested_hours={ticket?.Exclusion_Time}
+                                                />
+                                            </CollapseComponent>
+                                        ) : null
+                                    }
+                                </>
+                            ) : null}
 
 
                             <CollapseComponent headerText='STC Governance Acceptance Details'>

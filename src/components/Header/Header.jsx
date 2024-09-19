@@ -12,81 +12,35 @@ import axios from 'axios';
 import { TICKET_PERMISSIONS } from '../../lib/permissions';
 import { useNavigate } from 'react-router-dom';
 import { BASE_URL } from '../../constants/constants';
+import Loader from '../Common/Loader';
 
 
 
 
-export default function Header({ setOpen, sidebarOpen, setSidebarOpen }) {
+export default function Header({ setOpen, sidebarOpen, setSidebarOpen, items }) {
   const [username, setUsername] = useState('')
   const [logoutVisible, setLogoutVisible] = useState(false);
-  const [items, setItems] = useState([]);
-  const { session, signOut } = useAuth();
+  const {  signOut } = useAuth();
   const navigate = useNavigate();
   const storedSession = JSON.parse(localStorage.getItem('session'));
+  
 
 
   const logOutUser = async () => {
     signOut();
   }
 
-  const searchPendingTickets = async () => {  
-
-    if (storedSession) {
-      try {
-        const res = await axios.get(`${BASE_URL}/ticket/user-pending-tickets-for-action`,
-          {
-            headers: {
-              Authorization: storedSession.Authorization,
-            },
-            params: {
-              user_id: storedSession.user.id, 
-            },
-          }
-        );
-        
-        console.log(res);
-        
-        const tickets = res.data;
-        const tempItems = [];
-
-        const my_obj = {
-          key: '1',
-          label: (
-            <span onClick={() => { window.location.href = '/dashboard#ViewMTTR'; }} className='text-stc-red hover:text-white py-1 w-full px-3 hover:bg-stc-red'>
-              {tickets.data.length} Requests ({CONTRACTOR})
-            </span>
-          )
-        }
-        tempItems.push(my_obj)
-        setItems(tempItems);
-
-
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          console.log(error);
-          if (error.response.status == 403) {
-            alert("Session expired, Kindly Login Again.");
-            signOut();
-          }
-        }
-      }
-    } else {
-      alert("Kindly Login First.");
-      navigate(`/`);
-    }
-  }
-
-
   useEffect(() => {
     console.log("is this even working");
-    console.log(storedSession)
+    console.log(items)
     
     
     if (storedSession) {
       setUsername(storedSession.user?.email ?? '')
-      searchPendingTickets();
     }
   }, [])
+
+
 
   return (
     <FlexDiv justify='space-between' classes='w-full h-16 px-1 bg-stc-purple'>

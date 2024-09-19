@@ -30,60 +30,64 @@ export default function PendingTickets(
     const searchPendingTickets = async () => {
         setLoading(true);
 
-        if (storedSession && !tickets) {
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/ticket/user-pending-tickets-for-action`,
+            headers: {
+                'Authorization': storedSession.Authorization,
+                'Content-Type': 'application/json'
+            },
+            params: {
+                user_id: storedSession.user.id,
+            }
+        };
 
-            let config = {
-                method: 'get',
-                maxBodyLength: Infinity,
-                url: `${BASE_URL}/ticket/user-pending-tickets-for-action`,
-                headers: {
-                    'Authorization': storedSession.Authorization,
-                    'Content-Type': 'application/json'
-                },
-                params: {
-                    user_id: storedSession.user.id,
+        axios.request(config)
+            .then((response) => {
+                console.log(JSON.stringify(response.data));
+                if (notification) {
+                    setTickets(response.data.data);
+                    setLoading(false);
                 }
-            };
-
-            axios.request(config)
-                .then((response) => {
-                    console.log(JSON.stringify(response.data));
-                    if (notification) {
-                        setTickets(response.data.data);
-                    }
-                    else {
-                        setTickets(response.data.data);
-                    }
-                })
-                .catch((error) => {
-                    console.log(error);
-                    if (axios.isAxiosError(error)) {
-                        console.log(error)
-                        setErrorMessage(!error.response.data)
-                        setErrorResult(true)
-                        setLoading(false)
-                    } else {
-                        setErrorMessage('Something went wrong!')
-                        setErrorResult(true)
-                        setLoading(false)
-                    }
-                })
-                .finally(() => {
+                else {
+                    setTickets(response.data.data);
+                    setLoading(false);
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+                if (axios.isAxiosError(error)) {
+                    console.log(error)
+                    setErrorMessage(!error.response.data)
+                    setErrorResult(true)
                     setLoading(false)
-                });
-        } else {
-            navigate(`/`);
-        }
+                } else {
+                    setErrorMessage('Something went wrong!')
+                    setErrorResult(true)
+                    setLoading(false)
+                }
+            })
+            .finally(() => {
+                setLoading(false)
+            });
+
     }
 
 
     useEffect(() => {
         if (storedSession && !tickets) {
             searchPendingTickets();
+        } else {
+            navigate(`/`);
         }
     }, [])
 
-
+    if (loading) return (
+        <FlexDiv classes='w-screen h-screen'>
+            <Loader />
+        </FlexDiv>
+    )
     return (
         <div>
             <FlexDiv classes='min-h-[80vh] bg-white p-10' alignment='start'>

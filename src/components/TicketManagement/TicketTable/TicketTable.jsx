@@ -310,7 +310,7 @@ const TicketsTable = ({ data }) => {
             onRow={(record, index) => {
               return {
                 onClick: () => {
-                  navigate(`/ticket/${record.PR_ID}`)
+                  navigate(`/ticket/${record.PR_ID}?source=pending`)
                 }
               }
             }}

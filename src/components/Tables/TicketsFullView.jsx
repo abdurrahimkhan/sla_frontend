@@ -7,6 +7,8 @@ import { BASE_URL } from '../../constants/constants';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../Common/Loader';
+import ErrorModal from '../Common/ErrorModal';
+import ErrorResult from '../Common/ErrorResult';
 
 
 
@@ -15,6 +17,9 @@ export default function TicketsFullView({ setOpen, sidebarOpen, setSidebarOpen }
   const [rowData, setRowData] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [errorResult, setErrorResult] = useState(false);
+  const [status, setStatus] = useState(0);
+  const [errorMessage, setErrorMessage] = useState('')
   const storedSession = JSON.parse(localStorage.getItem('session'));
   const navigate = useNavigate();
 
@@ -45,6 +50,16 @@ export default function TicketsFullView({ setOpen, sidebarOpen, setSidebarOpen }
       })
       .catch((error) => {
         console.log(error);
+        if (axios.isAxiosError(error)) {
+          console.log(error)
+          setErrorMessage(error.response.data.message)
+          setErrorResult(true)
+          setLoading(false)
+        } else {
+          setErrorMessage('Something went wrong!')
+          setErrorResult(true)
+          setLoading(false)
+        }
       });
   }
 
@@ -59,7 +74,7 @@ export default function TicketsFullView({ setOpen, sidebarOpen, setSidebarOpen }
 
   const handleRowClick = (event) => {
     const rowId = event.data.PR_ID; // Assuming 'id' is the key for unique row IDs
-    navigate(`/ticket/${rowId}`); // Navigate to /ticket/id
+    navigate(`/ticket/${rowId}?source=ViewTicket`); // Navigate to /ticket/id
   };
 
   if (loading) return (
@@ -67,20 +82,34 @@ export default function TicketsFullView({ setOpen, sidebarOpen, setSidebarOpen }
       <Loader />
     </FlexDiv>
   )
+
   return (
-    <FlexDiv>
 
-      <div className="ag-theme-alpine" style={{ height: 536, width: '100%' }}>
-        <AgGridReact
-          rowData={rowData}
-          columnDefs={columnDefs}
-          pagination={true}
-          paginationPageSize={10} // Set pagination to 10 rows per page
-          defaultColDef={{ sortable: true, filter: true }}
-          onRowClicked={handleRowClick}
+    <>
+      {
+        errorResult ?
+          <FlexDiv classes='mt-[12%]'>
+            <ErrorResult text={errorMessage} onClick={() => navigate('/dashboard#Home')} />
+          </FlexDiv> :
+          <FlexDiv>
 
-        />
-      </div>
-    </FlexDiv>
+            <div className="ag-theme-alpine" style={{ height: 536, width: '100%' }}>
+              <AgGridReact
+                rowData={rowData}
+                columnDefs={columnDefs}
+                pagination={true}
+                paginationPageSize={10} // Set pagination to 10 rows per page
+                defaultColDef={{ sortable: true, filter: true }}
+                onRowClicked={handleRowClick}
+
+              />
+            </div>
+
+            {status === 500 && <ErrorModal heading='Something went wrong!' body={errorMessage} open={status === 500} close={() => setStatus(0)} />}
+
+          </FlexDiv>
+      }
+    </>
+
   )
 }
