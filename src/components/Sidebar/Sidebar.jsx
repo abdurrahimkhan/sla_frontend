@@ -1,6 +1,7 @@
 import React from "react";
 import FlexDiv from "../Common/FlexDiv";
 import { IoAddCircleOutline, IoCalendarOutline, IoCreateOutline, IoHomeOutline, IoNotificationsOutline, IoSearchCircleOutline, IoSearchOutline, IoTicketOutline } from "react-icons/io5";
+import { FaTable } from "react-icons/fa";
 
 
 
@@ -32,6 +33,10 @@ const navItems = [
     {
         icon: <IoAddCircleOutline className="text-white text-2xl font-thin" />,
         text: 'Import'
+    },
+    {
+        icon: <FaTable className="text-white text-2xl font-thin" />,
+        text: 'AllTickets'
     }
 ]
 

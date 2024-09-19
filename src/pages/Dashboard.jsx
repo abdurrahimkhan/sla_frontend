@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import MiddlewareProvider from '../Middleware/AuthMiddleware';
 import CreateUser from '../components/UserManagement/CreateUser';
 import UserProfile from '../components/UserManagement/UserProfile';
+import TicketsFullView from '../components/Tables/TicketsFullView';
 
 
 const tabs = [
@@ -63,6 +64,10 @@ const tabs = [
     {
         name: 'Import',
         component: <BulkUploader />
+    },
+    {
+        component: <TicketsFullView />,
+        name: 'AllTickets'
     }
 ];
 

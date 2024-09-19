@@ -3,6 +3,7 @@ import React from 'react'
 import {  IoAddCircleSharp, IoCalendarSharp, IoCreateSharp, IoShareSharp, IoTicketSharp } from 'react-icons/io5';
 import FlexDiv from '../Common/FlexDiv';
 import { MdAccountCircle } from 'react-icons/md';
+import { FaTable } from 'react-icons/fa';
 
 
 const panels = [
@@ -43,6 +44,12 @@ const panels = [
     name: 'Feedback',
     link: '/dashboard#Feedback',
     icon: <IoShareSharp className="text-4xl font-medium" />,
+  }
+  ,
+  {
+    name: 'ViewData',
+    link: '/dashboard#AllTickets',
+    icon: <FaTable className="text-4xl font-medium" />,
   }
 ]
 export default function Home() {
