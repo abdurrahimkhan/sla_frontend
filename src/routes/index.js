@@ -3,7 +3,7 @@ import Error from "../pages/Error"
 import Login from "../pages/Login"
 import Dashboard from "../pages/Dashboard"
 import TicketPage from "../pages/TicketPage"
-// import withAuth from "../Middleware/AuthMiddleware"
+// import withAuth from "../middleware/AuthMiddleware"
 
 export default function WebRouter() {
     let routes = useRoutes([

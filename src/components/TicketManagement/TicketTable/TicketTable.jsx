@@ -11,7 +11,7 @@ import FlexDiv from '../../Common/FlexDiv';
 import {  useNavigate  } from 'react-router-dom';
 
 
-const TicketsTable = ({ data }) => {
+const TicketsTable = ({ data, searchTicket }) => {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
@@ -310,7 +310,7 @@ const TicketsTable = ({ data }) => {
             onRow={(record, index) => {
               return {
                 onClick: () => {
-                  navigate(`/ticket/${record.PR_ID}?source=pending`)
+                  navigate(`/ticket/${record.PR_ID}?source=${searchTicket ? 'ViewTicket' : 'pending'}`)
                 }
               }
             }}

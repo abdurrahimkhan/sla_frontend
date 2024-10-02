@@ -4,7 +4,7 @@ import FlexDiv from '../Common/FlexDiv'
 import axios from 'axios';
 import SuccessModal from '../Common/SuccessModal';
 import ErrorModal from '../Common/ErrorModal';
-import useAuth from '../../Auth/useAuth';
+import useAuth from '../../auth/useAuth';
 
 export default function ContractorInfo(
     {

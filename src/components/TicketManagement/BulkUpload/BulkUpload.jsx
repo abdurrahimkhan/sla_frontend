@@ -6,7 +6,7 @@ import Loader from '../../Common/Loader';
 import { UPDATE_PERMISSIONS } from '../../../lib/permissions';
 import ErrorResult from '../../Common/ErrorResult';
 // import { useSession } from 'next-auth/react';
-import useAuth from '../../../Auth/useAuth';
+import useAuth from '../../../auth/useAuth';
 
 
 

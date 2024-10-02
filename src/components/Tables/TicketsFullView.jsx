@@ -78,7 +78,7 @@ export default function TicketsFullView({ setOpen, sidebarOpen, setSidebarOpen }
   };
 
   if (loading) return (
-    <FlexDiv classes='w-screen h-screen'>
+    <FlexDiv classes='w-[calc(100vw-300px)] h-[calc(100vh-200px)]'>
       <Loader />
     </FlexDiv>
   )
@@ -93,12 +93,12 @@ export default function TicketsFullView({ setOpen, sidebarOpen, setSidebarOpen }
           </FlexDiv> :
           <FlexDiv>
 
-            <div className="ag-theme-alpine" style={{ height: 536, width: '100%' }}>
+            <div className="ag-theme-alpine" style={{ height: '75vh', width: '100%' }}>
               <AgGridReact
                 rowData={rowData}
                 columnDefs={columnDefs}
                 pagination={true}
-                paginationPageSize={10} // Set pagination to 10 rows per page
+                paginationPageSize={15} // Set pagination to 10 rows per page
                 defaultColDef={{ sortable: true, filter: true }}
                 onRowClicked={handleRowClick}
 

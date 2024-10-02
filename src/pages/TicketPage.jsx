@@ -1,4 +1,4 @@
-import useAuth from '../Auth/useAuth';
+import useAuth from '../auth/useAuth';
 import BaseLayout from '../components/BaseLayout/BaseLayout'
 import CollapseComponent from '../components/Common/Collapse';
 import Container from '../components/Common/Container';

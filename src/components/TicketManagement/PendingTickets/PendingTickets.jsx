@@ -6,7 +6,7 @@ import TicketsTable from '../TicketTable/TicketTable';
 import Loader from '../../Common/Loader';
 import { TICKET_PERMISSIONS } from '../../../lib/permissions';
 // import { useSession } from 'next-auth/react';
-import useAuth from '../../../Auth/useAuth';
+import useAuth from '../../../auth/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { BASE_URL } from '../../../constants/constants';
 import ErrorResult from '../../Common/ErrorResult';
@@ -18,7 +18,7 @@ export default function PendingTickets(
 ) {
     console.log("PT");
     const [tickets, setTickets] = useState();
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     // const { data: session } = useSession();
     const { session, signOut } = useAuth();
     const [errorMessage, setErrorMessage] = useState('')
@@ -84,7 +84,7 @@ export default function PendingTickets(
     }, [])
 
     if (loading) return (
-        <FlexDiv classes='w-screen h-screen'>
+        <FlexDiv classes='w-[calc(100vw-300px)] h-[calc(100vh-200px)]'>
             <Loader />
         </FlexDiv>
     )

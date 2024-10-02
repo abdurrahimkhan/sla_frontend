@@ -34,6 +34,10 @@ const CalendarComponent = () => {
 
   const handleSelect = (value, selectInfo) => {
     console.log(value.format('YYYY-MM-DD'), selectInfo);
+    if (selectInfo.source !== 'date') {
+      return;
+    }
+    
 
     let config = {
       method: 'get',
@@ -47,10 +51,8 @@ const CalendarComponent = () => {
 
     axios.request(config)
       .then((response) => {
-        console.log(JSON.stringify(response.data));
         setSlaDetails(response.data.count);
         setStatus(200);
-        console.log("donereceived");
         
       })
       .catch((error) => {
@@ -69,21 +71,6 @@ const CalendarComponent = () => {
         }
       });
 
-    // If end date is less than start date, reset start and end date
-    // if (startDate !== null && value.format('YYYY-MM-DD') < startDate) {
-    //   setStartDate(null);
-    //   setEndDate(null);
-    // }
-
-    // if (endDate !== null) {
-    //   setStartDate(null);
-    //   setEndDate(null);
-    // }
-    // if (startDate === null) {
-    //   setStartDate(value.format('YYYY-MM-DD'));
-    // } else if (startDate !== null) {
-    //   setEndDate(value.format('YYYY-MM-DD'));
-    // }
 
   };
 

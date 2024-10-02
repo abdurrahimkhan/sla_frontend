@@ -234,7 +234,21 @@ export default function UserForm() {
 
               </FlexDiv>
 
-              <FlexDiv gapX={20}>
+              <FlexDiv gapX={20} justify='start' alignment='start'>
+              <InputContainer label='Rank' required={true}>
+                  <input
+                    onChange={(e) => setRank(e.target.value)}
+                    type='text' placeholder='Enter Rank' className='w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3 pl-4' />
+                </InputContainer>
+              <InputContainer label='STC Employee' required={true}>
+                  <input
+                    onChange={handleCheckboxChange}
+                    type='checkbox' checked={isSTC} className="w-14 h-14 mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3" />
+                </InputContainer>
+               
+              </FlexDiv>
+
+              <FlexDiv gapX={20} alignment='start'>
                 <InputContainer label="Domain List" required={true}>
                   {/* MultiSelect dropdown */}
                   <Multiselect
@@ -246,26 +260,24 @@ export default function UserForm() {
                     onRemove={(remainingList) => handleRemove(remainingList, "Domain")}
                     displayValue="displayName" // Property name to display in the dropdown
                     placeholder="Select Domain"
-                    className="w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3 pl-4"
+                    className="mt-2 w-full focus:outline-none border border-stc-purple rounded-[4px] py-2 pl-4"
                     style={{
                       searchBox: {
-                        padding: '12px',
-                        border: '1px solid #6b46c1',
+                        border: 'none',
                         borderRadius: '4px',
-                        width: '100%',
                       },
                       multiselectContainer: {
                         width: '100%',
                       },
                       chips: {
-                        background: '#6b46c1',
+                        background: '#4f008c',
                       },
                     }}
                   />
                 </InputContainer>
 
                 <InputContainer label="District List" required={true}>
-                  <Multiselect 
+                  <Multiselect
                     options={DistrictList.map((item) => ({
                       id: item.id,
                       displayName: `${item.name} (${item.level})`,
@@ -274,11 +286,10 @@ export default function UserForm() {
                     onRemove={(remainingList) => handleRemove(remainingList, "District")}
                     displayValue="displayName" // Property name to display in the dropdown
                     placeholder="Select District"
-                    className="w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3 pl-4"
+                    className="w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-2 pl-4"
                     style={{
                       searchBox: {
-                        padding: '12px',
-                        border: '1px solid #6b46c1',
+                        border: 'none',
                         borderRadius: '4px',
                         width: '100%',
                       },
@@ -286,26 +297,13 @@ export default function UserForm() {
                         width: '100%',
                       },
                       chips: {
-                        background: '#6b46c1',
+                        background: '#4f008c',
                       },
                     }}
                   />
                 </InputContainer>
               </FlexDiv>
-
-              <FlexDiv gapX={20}>
-                <InputContainer label='Rank' required={true}>
-                  <input
-                    onChange={(e) => setRank(e.target.value)}
-                    type='text' placeholder='Enter Rank' className='w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3 pl-4' />
-                </InputContainer>
-
-                <InputContainer label='STC Employee' required={true}>
-                  <input
-                    onChange={handleCheckboxChange}
-                    type='checkbox' checked={isSTC} className="w-10 mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3" />
-                </InputContainer>
-              </FlexDiv>
+              
 
               {
                 error &&

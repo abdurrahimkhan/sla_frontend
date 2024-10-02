@@ -3,7 +3,7 @@ import { FormEvent, useEffect, useState } from 'react'
 import FlexDiv from '../components/Common/FlexDiv';
 import Loader from '../components/Common/Loader';
 import { PORTAL_NAME } from '../constants/constants';
-import useAuth from '../Auth/useAuth'
+import useAuth from '../auth/useAuth'
 import { useNavigate } from 'react-router-dom';
 
 

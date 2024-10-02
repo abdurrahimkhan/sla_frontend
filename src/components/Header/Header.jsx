@@ -7,7 +7,7 @@ import { IoLogOutOutline } from 'react-icons/io5';
 import ClickAwayListener from 'react-click-away-listener';
 import { Dropdown, MenuProps } from 'antd';
 import { CONTRACTOR } from '../../constants/constants';
-import useAuth from '../../Auth/useAuth';
+import useAuth from '../../auth/useAuth';
 import axios from 'axios';
 import { TICKET_PERMISSIONS } from '../../lib/permissions';
 import { useNavigate } from 'react-router-dom';
@@ -20,11 +20,11 @@ import Loader from '../Common/Loader';
 export default function Header({ setOpen, sidebarOpen, setSidebarOpen, items }) {
   const [username, setUsername] = useState('')
   const [logoutVisible, setLogoutVisible] = useState(false);
-  const {  signOut } = useAuth();
+  const { signOut } = useAuth();
   const navigate = useNavigate();
   const storedSession = JSON.parse(localStorage.getItem('session'));
-  
 
+  console.log(items)
 
   const logOutUser = async () => {
     signOut();
@@ -33,8 +33,8 @@ export default function Header({ setOpen, sidebarOpen, setSidebarOpen, items }) 
   useEffect(() => {
     console.log("is this even working");
     console.log(items)
-    
-    
+
+
     if (storedSession) {
       setUsername(storedSession.user?.email ?? '')
     }
@@ -50,16 +50,19 @@ export default function Header({ setOpen, sidebarOpen, setSidebarOpen, items }) 
       </FlexDiv>
 
       <FlexDiv classes='w-1/2 mr-2' justify='end' gapX={10}>
-        <Dropdown menu={{ items }} placement="bottomRight" arrow>
-          <div className=' cursor-pointer'>
-            <FaRegBell className='text-white text-2xl mr-4' />
-            {items.length > 0 &&
+        {items.length > 0 ?
+          <Dropdown menu={{ items }} placement="bottomRight" arrow>
+            <div className=' cursor-pointer'>
+              <FaRegBell className='text-white text-2xl mr-4' />
+
               <div className='absolute ml-[11px] -mt-4 text-[10px] bg-stc-red text-white w-4 h-4 rounded-full flex justify-center items-center'>
                 {items?.length}
               </div>
-            }
-          </div>
-        </Dropdown>
+
+            </div>
+          </Dropdown> :
+          <FaRegBell className='text-white text-2xl mr-4' />
+        }
         <div className='' onClick={() => setLogoutVisible(!logoutVisible)}>
           <FlexDiv classes='w-fit hover:bg-stc-red h-full py-2 px-2 cursor-pointer' gapX={10}>
             <MdAccountCircle className='text-white text-2xl' />

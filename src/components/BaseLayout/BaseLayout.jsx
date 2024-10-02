@@ -41,17 +41,19 @@ export default function BaseLayout({
                 console.log(JSON.stringify(response.data));
                 const tickets = response.data;
                 const tempItems = [];
-                const my_obj = {
-                    key: '1',
-                    label: (
-                        <span onClick={() => { window.location.href = '/dashboard#ViewMTTR'; }} className='text-stc-red hover:text-white py-1 w-full px-3 hover:bg-stc-red'>
-                            {tickets.data.length} Requests ({CONTRACTOR})
-                        </span>
-                    )
+                if (tickets.data.length > 0) {
+                    const my_obj = {
+                        key: '1',
+                        label: (
+                            <span onClick={() => { window.location.href = '/dashboard#ViewMTTR'; }} className='text-stc-red hover:text-white py-1 w-full px-3 hover:bg-stc-red'>
+                                {tickets.data.length} Requests ({CONTRACTOR})
+                            </span>
+                        )
+                    }
+                    tempItems.push(my_obj);
                 }
-                tempItems.push(my_obj);
                 console.log(tempItems);
-                
+
                 setItems(tempItems);
                 setLoading(false);
             })

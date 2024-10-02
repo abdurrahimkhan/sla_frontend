@@ -7,7 +7,7 @@ import PreviewForm from './SubComponents/PreviewForm'
 import { UPDATE_PERMISSIONS } from '../../../lib/permissions';
 import ErrorResult from '../../Common/ErrorResult';
 import Loader from '../../Common/Loader'
-import useAuth from '../../../Auth/useAuth'
+import useAuth from '../../../auth/useAuth'
 // import { useRouter } from 'next/navigation';
 
 export default function CreateTicket() {

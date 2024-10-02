@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import ErrorModal from '../Common/ErrorModal';
 import SuccessModal from '../Common/SuccessModal';
-import useAuth from '../../Auth/useAuth';
+import useAuth from '../../auth/useAuth';
 import { BASE_URL } from '../../constants/constants';
 import ErrorResult from '../Common/ErrorResult';
 

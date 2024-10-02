@@ -17,11 +17,11 @@ const panels = [
     link: '/dashboard#View',
     icon: <IoTicketSharp className=" text-4xl font-medium" />,
   },
-  {
-    name: 'Create Ticket',
-    link: '/dashboard#Create',
-    icon: <IoCreateSharp className=" text-4xl font-medium" />
-  },
+  // {
+  //   name: 'Create Ticket',
+  //   link: '/dashboard#Create',
+  //   icon: <IoCreateSharp className=" text-4xl font-medium" />
+  // },
   // {
   //   name: 'Upload Bulk Tickets',
   //   link: '/dashboard#Import',

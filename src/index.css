@@ -1263,3 +1263,34 @@ textarea.form-control {
 .ant-table-column-sorter {
   color: #fff!important;
 }
+
+.input-container div {
+  width: 100%;
+}
+
+.multiSelectContainer li:hover {
+  background: #4f008c !important;
+  color: #fff;
+}
+
+.highlightOption {
+  background: #4f008c !important;
+  color: #fff;
+}
+
+.ag-header-viewport {
+  background: #4f008c !important;
+  color: #fff !important;
+}
+
+.ag-header-icon .ag-icon-filter {
+  color: #fff !important;
+}
+
+.ag-header-cell-text {
+  color: #fff !important;
+}
+
+.ant-picker-calendar-date-value {
+  margin-top: 10px !important;
+}
