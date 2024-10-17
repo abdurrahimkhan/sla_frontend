@@ -60,17 +60,19 @@ export default function StcNocForm({ ticket_number, currentState, requested_hour
     if (session && session.user) {
 
       if (remarks !== ''){
-        const res = await axios.put(`${BASE_URL}/ticket/ticket-stc-governance-reject`,
+        const res = await axios.put(
+          `${BASE_URL}/ticket/ticket-stc-governance-reject`,
+          {
+            ticketId: ticket_number,
+            remarks: remarks,
+            acceptedTime: 0,
+            user: storedSession.user.email,
+          },
           {
             headers: {
               Authorization: storedSession.Authorization,
               'Content-Type': 'application/json'
-            },
-            data: {
-              ticketId: ticket_number,
-              remarks: remarks,
-              user: storedSession.user.email,
-            },
+            }
           }
         );
 

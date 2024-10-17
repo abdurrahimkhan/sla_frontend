@@ -82,7 +82,7 @@ export default function SearchTicket() {
                     </button>
 
                     {
-                        data && <TicketsTable data={data} searchTicket />
+                        data && <TicketsTable data={data} searchTicket={true} />
                     }
 
                 </FlexDiv>

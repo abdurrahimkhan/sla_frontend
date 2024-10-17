@@ -55,44 +55,34 @@ export default function StcRegionalForm(
         setErrorMessage('Please add remarks and exclusion time.')
         setStatus(500)
       }
-    } else{
+    } else {
 
     }
   }
 
 
   const rejectTicket = async () => {
-
-
-
     if (session && session.user) {
 
       if (remarks !== '') {
-        if (!initialRejection) {
-          const res = await axios.post('/api/ticket/update/stc_region/initial', null, {
-            params: {
-              ticket_number: ticket_number,
-              remarks: remarks,
-              handler: session.user.name,
-              current_state: currentState,
+        const res = await axios.put(
+          `${BASE_URL}/ticket/ticket-stc-regional-reject`,
+          {
+            ticketId: ticket_number,
+            remarks: remarks,
+            acceptedTime: 0,
+            user: storedSession.user.email,
+          },
+          {
+            headers: {
+              Authorization: storedSession.Authorization,
+              'Content-Type': 'application/json'
             }
-          });
+          }
+        );
 
-          setStatus(200);
-        } else {
-          const res = await axios.post('/api/ticket/update/stc_region', null, {
-            params: {
-              ticket_number: ticket_number,
-              accepted_rejected: 'Rejected',
-              approved_requested_time: 0,
-              remarks: remarks,
-              handler: session.user.name,
-              current_state: currentState,
-            }
-          });
+        setStatus(200);
 
-          setStatus(200);
-        }
       } else {
         setErrorMessage('Please add remarks')
         setStatus(500)
@@ -110,12 +100,12 @@ export default function StcRegionalForm(
 
       <FlexDiv justify='space-between' classes='border-b border-stc-black'>
         <span className='font-medium'>Approved Requested Time</span>
-        <input defaultValue={acceptedExculsionTime} max={acceptedExculsionTime} min={1} onChange={(e)=>setAcceptedExclusionTime(parseFloat(e.target.value))}  type='number' className='focus:outline-none border border-slate-400 px-2 py-1 border-opacity-40 rounded-sm ' />
+        <input defaultValue={acceptedExculsionTime} max={acceptedExculsionTime} min={1} onChange={(e) => setAcceptedExclusionTime(parseFloat(e.target.value))} type='number' className='focus:outline-none border border-slate-400 px-2 py-1 border-opacity-40 rounded-sm ' />
       </FlexDiv>
 
       <FlexDiv justify='space-between' classes='border-b border-stc-black'>
         <span className='font-medium'>Remarks</span>
-        <textarea onChange={(e)=>setRemarks(e.target.value)} className='focus:outline-none border border-slate-400 rounded-sm h-24 w-3/4 px-2 py-1' ></textarea>
+        <textarea onChange={(e) => setRemarks(e.target.value)} className='focus:outline-none border border-slate-400 rounded-sm h-24 w-3/4 px-2 py-1' ></textarea>
       </FlexDiv>
       <FlexDiv justify='space-between' classes='border-b border-stc-black'>
         <div>

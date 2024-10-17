@@ -20,6 +20,9 @@ export default function SpocValidationForm({ ticket_number, Exclusion_Reason, Hu
   const [selectedExclusionReason, setSelectedExclusionReason] = useState(Exclusion_Reason);
   const storedSession = JSON.parse(localStorage.getItem('session'));
   const { session, signOut } = useAuth();
+  console.log(selectedExclusionReason);
+  console.log(Exclusion_Reason);
+  
 
 
 
@@ -64,17 +67,24 @@ export default function SpocValidationForm({ ticket_number, Exclusion_Reason, Hu
     if (storedSession) {
 
       if (remarks !== '') {
-        const res = await axios.put(`${BASE_URL}/ticket/ticket-spoc-validation-return`,
+        console.log({
+          ticketId: ticket_number,
+          spm: selectedExclusionReason.includes('Spare Parts') ? true : false,
+          user: storedSession.user.email,
+        });
+        const res = await axios.put(
+          `${BASE_URL}/ticket/ticket-spoc-validation-return`,
+          {
+            ticketId: ticket_number,
+            spm: selectedExclusionReason.includes('Spare Parts') ? true : false,
+            user: storedSession.user.email,
+            noc_remarks: "returning"
+          },
           {
             headers: {
-              Authorization: storedSession.Authorization,
+              Authorization: 'Bearer ' + storedSession.Authorization,
               'Content-Type': 'application/json'
-            },
-            data: {
-              ticketId: ticket_number,
-              spm: selectedExclusionReason.includes('Spare Parts') ? true : false,
-              user: storedSession.user.email,
-            },
+            }
           }
         );
 
@@ -86,34 +96,68 @@ export default function SpocValidationForm({ ticket_number, Exclusion_Reason, Hu
     }
   }
 
+  const closeTicket = async () => {
+    const res = await axios.put(`${BASE_URL}/ticket/close-ticket`,
+      {
+        headers: {
+          Authorization: storedSession.Authorization,
+          'Content-Type': 'application/json'
+        },
+        data: {
+          ticketId: ticket_number,
+          spm: selectedExclusionReason.includes('Spare Parts') ? true : false,
+          user: storedSession.user.email,
+        },
+      }
+    );
+
+    setStatus(200);
+  }
+
+  const returnTicketToSPM = async () => {
+    if (remarks !== '') {
+      // return to spm guy
+      const res = await axios.put(`${BASE_URL}/ticket/ticket-spm-validation-return`,
+        {
+          headers: {
+            Authorization: storedSession.Authorization,
+            'Content-Type': 'application/json'
+          },
+          data: {
+            ticketId: ticket_number,
+            spm: selectedExclusionReason.includes('Spare Parts') ? true : false,
+            user: storedSession.user.email,
+          },
+        }
+      );
+
+      setStatus(200);
+    } else {
+      setErrorMessage('Please add remarks')
+      setStatus(500)
+    }
+  }
+
   useEffect(() => {
 
     if (storedSession) {
       const fetchData = async () => {
         try {
-          // const response = await axios.get(`${BASE_URL}/ticket/get-exclusion-reasons`,
-          //   {
-          //     headers: {
-          //       Authorization: storedSession.Authorization,
-          //       'Content-Type': 'application/json'
-          //     }
-          //   }
-          // );
+          const response = await axios.get(`${BASE_URL}/exclusion-reason/fetch-all`,
+            {
+              headers: {
+                Authorization: storedSession.Authorization,
+                'Content-Type': 'application/json'
+              }
+            }
+          );
 
-          const response = {
-            1: "Accessibility - Limited Business Hours (Region)",
-            2: "Accessibility - Pre-Access Permit Required(Region)",
-            3: "Spare Parts - Limited stock (Region)",
-            4: "Planned Activities - Within Approved window (NOC)",
-            5: "Main AC Power Loss - SEC Blackout (NOC)",
-            6: "Fault Beyond MSP Scope Responsibility - External Operation Organization(NOC)"
-          }
-
-
-          const ERArray = Object.entries(response).map(([key, value]) => ({
-            id: key,
-            label: value,
+          const ERArray = response.data.map(item => ({
+            id: item.id,
+            value: item.exclusion_reason,
+            label: `${item.exclusion_reason} (${item.region_noc})`,
           }));
+
           setExclusionReasons(ERArray); // Assuming data is an array
         } catch (error) {
           console.error('Error fetching data:', error);
@@ -136,6 +180,20 @@ export default function SpocValidationForm({ ticket_number, Exclusion_Reason, Hu
         <button onClick={returnTicket} className='bg-stc-red shadow-lg text-white py-2 px-3 rounded-md'>Return</button>
       </FlexDiv>
 
+      <FlexDiv justify='space-between' classes='border-b border-stc-black'>
+        <span className='font-medium'>Mark Request as No exclusion Required</span>
+        <button onClick={closeTicket} className='bg-stc-red shadow-lg text-white py-2 px-3 rounded-md'>Close</button>
+      </FlexDiv>
+
+      {
+        Exclusion_Reason && Exclusion_Reason.includes('Spare Parts') ?
+          <FlexDiv justify='space-between' classes='border-b border-stc-black'>
+            <span className='font-medium'>Mark Request as No exclusion Required</span>
+            <button onClick={returnTicketToSPM} className='bg-stc-red shadow-lg text-white py-2 px-3 rounded-md'>Close</button>
+          </FlexDiv> : null
+      }
+
+
 
       <FlexDiv justify='space-between' classes='border-b border-stc-black'>
         <span className='font-medium'>Exclusion Time Requested</span>
@@ -145,7 +203,7 @@ export default function SpocValidationForm({ ticket_number, Exclusion_Reason, Hu
       <FlexDiv justify='space-between' classes='border-b border-stc-black'>
         <span className='font-medium'>Exclusion Reason</span>
         <select id="my-dropdown" value={selectedExclusionReason} onChange={handleChange} className='focus:outline-none border max-w-[260px] w-full border-slate-400 px-2 py-1 border-opacity-40 rounded-sm '>
-          <option value="" disabled>Select one</option>
+          <option value="">Select one</option>
           {exclusionReasons.map((exclusionReason) => (
             <option key={exclusionReason.id} value={exclusionReason.value}>
               {exclusionReason.label}

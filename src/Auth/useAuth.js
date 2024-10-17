@@ -27,7 +27,14 @@ const useAuth = () => {
     const userData = res.data;
 
     if (userData.status==200 && userData.message == 'success'){
-      const sessionData = { user: userData.data.user, Authorization: userData.data.access_token };
+      const privileges = await axios.get(`${BASE_URL}/user-permissions/get-permissions-by-user-id?userID=${userData.data.user.id}`,{
+        headers : {
+          'Authorization': `Bearer ${userData.data.access_token}`, // Example header
+          'Content-Type': 'application/json',     // Another example
+        }
+      });
+      
+      const sessionData = { user: userData.data.user, Authorization: userData.data.access_token, privileges: privileges.data };
       localStorage.setItem('session', JSON.stringify(sessionData));
       setSession(sessionData);
       setStatus('authenticated');

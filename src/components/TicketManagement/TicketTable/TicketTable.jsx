@@ -8,7 +8,7 @@ import Highlighter from 'react-highlight-words';
 import { CONTRACTOR } from '../../../constants/constants';
 import { Excel } from 'antd-table-saveas-excel';
 import FlexDiv from '../../Common/FlexDiv';
-import {  useNavigate  } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 
 const TicketsTable = ({ data, searchTicket }) => {
@@ -38,7 +38,7 @@ const TicketsTable = ({ data, searchTicket }) => {
     setSearchText('');
   };
 
-  const getColumnSearchProps = (dataIndex)=> ({
+  const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
       <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
         <Input
@@ -310,7 +310,11 @@ const TicketsTable = ({ data, searchTicket }) => {
             onRow={(record, index) => {
               return {
                 onClick: () => {
-                  navigate(`/ticket/${record.PR_ID}?source=${searchTicket ? 'ViewTicket' : 'pending'}`)
+                  if (searchTicket) {
+                    navigate(`/ticket/view/${record.PR_ID}`)
+                  } else {
+                    navigate(`/ticket/${record.PR_ID}?source=pending`)
+                  }
                 }
               }
             }}

@@ -77,29 +77,42 @@ export default function HuaDepartment({ ticket_number, currentState, requested_h
     if (storedSession) {
       const fetchData = async () => {
         try {
-          // const response = await axios.get(`${BASE_URL}/ticket/get-exclusion-reasons`,
-          //   {
-          //     headers: {
-          //       Authorization: storedSession.Authorization,
-          //       'Content-Type': 'application/json'
-          //     }
-          //   }
-          // );
+          const response = await axios.get(`${BASE_URL}/exclusion-reason/fetch-all`,
+            {
+              headers: {
+                Authorization: storedSession.Authorization,
+                'Content-Type': 'application/json'
+              }
+            }
+          );
 
-          const response = {
-            1: "Accessibility - Limited Business Hours (Region)",
-            2: "Accessibility - Pre-Access Permit Required(Region)",
-            3: "Spare Parts - Limited stock (Region)",
-            4: "Planned Activities - Within Approved window (NOC)",
-            5: "Main AC Power Loss - SEC Blackout (NOC)",
-            6: "Fault Beyond MSP Scope Responsibility - External Operation Organization(NOC)"
-          }
+          console.log(response);
+          // datasource db {
+          //   provider = "sqlserver"
+          //   url      = env("DATABASE_URL")
+          // }
+          // DATABASE_URL="sqlserver://localhost:1433;database=sla;user=sla_user;password=huawei123;encrypt=true;trustServerCertificate=true;"
 
+          // const response = {
+          //   1: "Accessibility - Limited Business Hours (Region)",
+          //   2: "Accessibility - Pre-Access Permit Required(Region)",
+          //   3: "Spare Parts - Limited stock (Region)",
+          //   4: "Planned Activities - Within Approved window (NOC)",
+          //   5: "Main AC Power Loss - SEC Blackout (NOC)",
+          //   6: "Fault Beyond MSP Scope Responsibility - External Operation Organization(NOC)",
+          //   7: "Spare Parts - Limited stock",
+          //   8: "Spare Parts - zero stock"
+          // }
 
-          const ERArray = Object.entries(response).map(([key, value]) => ({
-            id: key,
-            label: value,
+          const ERArray = response.data.map(item => ({
+            id: item.id,
+            value: item.exclusion_reason,
+            label: `${item.exclusion_reason} (${item.region_noc})`,
           }));
+          // const ERArray = Object.entries(response.data).map(([key, value, region]) => ({
+          //   id: key,
+          //   label: value + '(' + region + ')',
+          // }));
           setExclusionReasons(ERArray); // Assuming data is an array
         } catch (error) {
           console.error('Error fetching data:', error);
