@@ -318,7 +318,7 @@ export default function UserForm() {
                 <button
                   onClick={handleSubmission}
                   type='button' className='bg-stc-purple text-white px-5 py-2 rounded-md'>
-                  Submit without Preview
+                  Submit
                 </button>
               </FlexDiv>
             </React.Fragment>

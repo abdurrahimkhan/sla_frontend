@@ -27,7 +27,7 @@ export default function TicketsFullView({ setOpen, sidebarOpen, setSidebarOpen }
     let config = {
       method: 'get',
       maxBodyLength: Infinity,
-      url: `${BASE_URL}/ticket/tickets-by-status?status=SPOC Validation`,
+      url: `${BASE_URL}/ticket/tickets-by-status?status=Closed`,
       headers: {
         'Authorization': storedSession.Authorization,
       }
@@ -51,6 +51,7 @@ export default function TicketsFullView({ setOpen, sidebarOpen, setSidebarOpen }
       .catch((error) => {
         console.log(error);
         if (axios.isAxiosError(error)) {
+          
           console.log(error)
           setErrorMessage(error.response.data.message)
           setErrorResult(true)

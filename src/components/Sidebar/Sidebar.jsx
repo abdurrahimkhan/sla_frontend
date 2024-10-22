@@ -41,7 +41,6 @@ const navItems = [
 ]
 
 
-
 export default function Sidebar({ opened, active, setActive }) {
     console.log(active);
     console.log('sidebar')

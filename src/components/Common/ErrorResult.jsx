@@ -7,7 +7,7 @@ const ErrorResult = ({ text, onClick }) => (
     title={text}
     extra={
       <button onClick={onClick}  className='bg-stc-red font-medium text-white px-3 py-2 rounded-md'>
-        Try Again
+        OK
       </button  >
     }
   />

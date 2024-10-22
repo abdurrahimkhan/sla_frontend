@@ -36,4 +36,20 @@ GOV rejects - hua_district and hua_department column should also be DISPUTE
 
  8:
  close option not available. TT cannot be closed.
+
+
+ 9:
+ spoc to spm point not available. how to return tt from spoc to spm.
+
+ 10:
+ call full view endpoint in the all ticket table
+
+ 11:
+ from sidebar, the # doesnt get set, from home, the hash gets set.
  
+
+ 12:
+ get rank field of the user while logging in [for leveling the div component in the process tt page]
+
+ 13:
+ split SPM Tt from others in the regional level.

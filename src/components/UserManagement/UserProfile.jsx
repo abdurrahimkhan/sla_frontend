@@ -136,68 +136,6 @@ export default function UserProfile() {
                         </FlexDiv>
 
                         <FlexDiv gapX={20}>
-                            <InputContainer label="Domain List" >
-                                {/* MultiSelect dropdown */}
-                                <Multiselect 
-                                    options={DomainList.map((item) => ({
-                                        id: item.id,
-                                        displayName: `${item.name} (${item.level})`,
-                                    }))}
-                                    selectedValues={selectedDomainIds}
-                                    disable={true} 
-                                    displayValue="displayName" // Property name to display in the dropdown
-                                    // customDisplay={(permission) => `${permission.name} (${permission.level})`}
-                                    placeholder="Select Domain"
-                                    className="w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3 pl-4"
-                                    style={{
-                                        searchBox: {
-                                            padding: '12px',
-                                            border: '1px solid #6b46c1',
-                                            borderRadius: '4px',
-                                            width: '100%',
-                                        },
-                                        multiselectContainer: {
-                                            width: '100%',
-                                        },
-                                        chips: {
-                                            background: '#6b46c1',
-                                        },
-                                    }}
-                                />
-                            </InputContainer>
-
-                            <InputContainer label="District List" >
-                                {/* MultiSelect dropdown */}
-                                <Multiselect 
-                                    options={DistrictList.map((item) => ({
-                                        id: item.id,
-                                        displayName: `${item.name} (${item.level})`,
-                                    }))}
-                                    selectedValues={selectedDistrictIds}
-                                    displayValue="displayName" // Property name to display in the dropdown
-                                    // customDisplay={(permission) => `${permission.name} (${permission.level})`}
-                                    placeholder="Select District"
-                                    disable={true} 
-                                    className="w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3 pl-4"
-                                    style={{
-                                        searchBox: {
-                                            padding: '12px',
-                                            border: '1px solid #6b46c1',
-                                            borderRadius: '4px',
-                                            width: '100%',
-                                        },
-                                        multiselectContainer: {
-                                            width: '100%',
-                                        },
-                                        chips: {
-                                            background: '#6b46c1',
-                                        },
-                                    }}
-                                />
-                            </InputContainer>
-                        </FlexDiv>
-
-                        <FlexDiv gapX={20}>
                             <InputContainer label='Rank' >
                                 <input
                                     disabled defaultValue={parentUser}
@@ -207,9 +145,70 @@ export default function UserProfile() {
                             <InputContainer label='STC Employee' >
                                 <input disabled
                                     // onChange={handleCheckboxChange}
-                                    type='checkbox' checked={storedSession.user.isSTC} className="w-10 mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3" />
+                                    type='checkbox' checked={storedSession.user.isSTC} className="w-14 h-14 mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3" />
                             </InputContainer>
                         </FlexDiv>
+
+                        <FlexDiv gapX={20}>
+                            <InputContainer label="Domain List" >
+                                {/* MultiSelect dropdown */}
+                                <Multiselect
+                                    options={DomainList.map((item) => ({
+                                        id: item.id,
+                                        displayName: `${item.name} (${item.level})`,
+                                    }))}
+                                    selectedValues={selectedDomainIds}
+                                    disable={true}
+                                    displayValue="displayName" // Property name to display in the dropdown
+                                    // customDisplay={(permission) => `${permission.name} (${permission.level})`}
+                                    placeholder=""
+                                    className="mt-2 w-full focus:outline-none border border-stc-purple rounded-[4px] py-2 pl-4"
+                                    style={{
+                                        searchBox: {
+                                            border: 'none',
+                                            borderRadius: '4px',
+                                        },
+                                        multiselectContainer: {
+                                            width: '100%',
+                                        },
+                                        chips: {
+                                            background: '#4f008c',
+                                        },
+                                    }}
+                                />
+                            </InputContainer>
+
+                            <InputContainer label="District List" >
+                                {/* MultiSelect dropdown */}
+                                <Multiselect
+                                    options={DistrictList.map((item) => ({
+                                        id: item.id,
+                                        displayName: `${item.name} (${item.level})`,
+                                    }))}
+                                    selectedValues={selectedDistrictIds}
+                                    displayValue="displayName" // Property name to display in the dropdown
+                                    // customDisplay={(permission) => `${permission.name} (${permission.level})`}
+                                    placeholder=""
+                                    disable={true}
+                                    className="w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-2 pl-4"
+                                    style={{
+                                        searchBox: {
+                                            border: 'none',
+                                            borderRadius: '4px',
+                                            width: '100%',
+                                        },
+                                        multiselectContainer: {
+                                            width: '100%',
+                                        },
+                                        chips: {
+                                            background: '#4f008c',
+                                        },
+                                    }}
+                                />
+                            </InputContainer>
+                        </FlexDiv>
+
+
 
                         {
                             error &&

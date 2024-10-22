@@ -10,11 +10,11 @@ import { BASE_URL } from '../../constants/constants';
 import ErrorResult from '../Common/ErrorResult';
 
 
-export default function SpmValidation({ ticket_number, Exclusion_Reason, requested_hours }) {
+export default function SpmValidation({ ticket_number, Exclusion_Reason, requested_hours, Huawei_Remarks }) {
   const [exclusionTime, setExclusionTime] = useState(parseFloat(requested_hours));
   const [status, setStatus] = useState(0);
   const [errorMessage, setErrorMessage] = useState('')
-  const [remarks, setRemarks] = useState('')
+  const [remarks, setRemarks] = useState(Huawei_Remarks)
   const { signOut } = useAuth();
   const [loading, setLoading] = useState(true);
   const [errorResult, setErrorResult] = useState(false);
@@ -172,7 +172,7 @@ export default function SpmValidation({ ticket_number, Exclusion_Reason, request
 
             <FlexDiv justify='space-between' classes='border-b border-stc-black'>
               <span className='font-medium'>Remarks</span>
-              <textarea onChange={(e) => setRemarks(e.target.value)} className='focus:outline-none border border-slate-400 rounded-sm h-24 w-3/4 px-2 py-1' ></textarea>
+              <textarea onChange={(e) => setRemarks(e.target.value)} value={remarks} className='focus:outline-none border border-slate-400 rounded-sm h-24 w-3/4 px-2 py-1' ></textarea>
             </FlexDiv>
 
             <FlexDiv justify='space-between' classes='border-b border-stc-black'>

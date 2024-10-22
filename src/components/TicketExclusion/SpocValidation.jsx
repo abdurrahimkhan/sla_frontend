@@ -188,8 +188,8 @@ export default function SpocValidationForm({ ticket_number, Exclusion_Reason, Hu
       {
         Exclusion_Reason && Exclusion_Reason.includes('Spare Parts') ?
           <FlexDiv justify='space-between' classes='border-b border-stc-black'>
-            <span className='font-medium'>Mark Request as No exclusion Required</span>
-            <button onClick={returnTicketToSPM} className='bg-stc-red shadow-lg text-white py-2 px-3 rounded-md'>Close</button>
+            <span className='font-medium'>Return to SPM</span>
+            <button onClick={returnTicketToSPM} className='bg-stc-red shadow-lg text-white py-2 px-3 rounded-md'>Return</button>
           </FlexDiv> : null
       }
 

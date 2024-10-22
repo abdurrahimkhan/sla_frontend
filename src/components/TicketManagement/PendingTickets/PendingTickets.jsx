@@ -105,10 +105,7 @@ export default function PendingTickets(
                                     tickets && <TicketsTable data={tickets} />
                                 }
                             </FlexDiv>
-
                 }
-
-
             </FlexDiv>
         </div>
     )
