@@ -28,7 +28,6 @@ export default function PendingTickets(
 
 
     const searchPendingTickets = async () => { 
-        setLoading(true);
 
         let config = {
             method: 'get',

@@ -21,7 +21,9 @@ export default function Login() {
   }
 
   useEffect(() => {
-
+    if (window.location.pathname !== "/") {
+      navigate('/');
+    }
     if (status === "unauthenticated") {
       setLoading(false);
     }
@@ -43,7 +45,8 @@ export default function Login() {
 
       if (res?.status === 200) {
         console.log("done login, sending to home page");
-        navigate(`/dashboard#Home`);
+        setLoading(false);
+        navigate(`/dashboard`);
       }
 
       if (res?.status === 401) {

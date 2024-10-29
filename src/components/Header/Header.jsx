@@ -1,30 +1,32 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import FlexDiv from '../Common/FlexDiv'
 // import { signOut, useSession } from 'next-auth/react';
 import { FaCaretDown, FaRegBell, FaBars } from "react-icons/fa";
 import { MdOutlineApps, MdAccountCircle } from "react-icons/md";
 import { IoLogOutOutline } from 'react-icons/io5';
 import ClickAwayListener from 'react-click-away-listener';
-import { Dropdown, MenuProps } from 'antd';
+import { Dropdown } from 'antd';
 import { CONTRACTOR } from '../../constants/constants';
 import useAuth from '../../auth/useAuth';
-import axios from 'axios';
-import { TICKET_PERMISSIONS } from '../../lib/permissions';
-import { useNavigate } from 'react-router-dom';
-import { BASE_URL } from '../../constants/constants';
-import Loader from '../Common/Loader';
+import { TicketCountContext } from '../../context/TicketNotifications/GlobalProvider';
 
 
 
 
-export default function Header({ setOpen, sidebarOpen, setSidebarOpen, items }) {
+export default function Header({ setOpen, sidebarOpen, setSidebarOpen }) {
   const [username, setUsername] = useState('')
   const [logoutVisible, setLogoutVisible] = useState(false);
   const { signOut } = useAuth();
-  const navigate = useNavigate();
   const storedSession = JSON.parse(localStorage.getItem('session'));
-
-  console.log(items)
+  const { ticketCount } = useContext(TicketCountContext);
+  const items = [{
+    key: '1',
+    label: (
+      <span onClick={() => { window.location.href = '/dashboard#ViewMTTR'; }} className='text-stc-red hover:text-white py-1 w-full px-3 hover:bg-stc-red'>
+        {ticketCount} Requests ({CONTRACTOR})
+      </span>
+    )
+  }];
 
   const logOutUser = async () => {
     signOut();

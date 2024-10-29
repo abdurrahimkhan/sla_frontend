@@ -20,107 +20,20 @@ import UserProfile from '../components/UserManagement/UserProfile';
 import TicketsFullView from '../components/Tables/TicketsFullView';
 
 
-const tabs = [
-    {
-        name: 'Home',
-        component: <Home />
-    },
-    {
-        name: 'Notifications',
-        component: <PendingTickets notification={true} type={'Both'} />
-    },
-    {
-        name: 'Search',
-        component: <SearchTicket />
-    },
-    {
-        name: 'View',
-        component: <PendingTickets />
-    },
-    {
-        name: 'ViewMTTR',
-        component: <PendingTickets notification={true} type={'MTTR'} />
-    },
-    {
-        name: 'ViewPTL',
-        component: <PendingTickets notification={true} type={'PTL'} />
-    },
-    {
-        name: 'Calendar',
-        component: <Calendar />
-    },
 
-    {
-        name: 'CreateUser',
-        component: <CreateUser />
-    },
-    {
-        name: 'Profile',
-        component: <UserProfile />
-    },
-    {
-        name: 'Import',
-        component: <BulkUploader />
-    },
-    {
-        component: <TicketsFullView />,
-        name: 'AllTickets'
-    }
-];
 
 export default function Dashboard() {
-    const [loading, setLoading] = useState(false);
-    const [activeTab, setActiveTab] = useState(tabs[0].name);
     // const router = useRouter();
     // const { session, status, signIn, signOut } = useAuth();
-    const navigate = useNavigate();
 
 
-    useEffect(() => {
-
-        const path = window.location.href;
-        const pathArray = path.split('#');
-        const tabName = pathArray[1];
-        if (tabName) {
-            setActiveTab(tabName);
-        }
-        setLoading(false);
-        if(tabName){
-            navigate(`/dashboard#${tabName}`);
-        }
-    }, [window.location.href]);
-
-
-    // useEffect(() => {
-    //     console.log("done");
-    //     console.log(activeTab);
-    //     navigate(`/dashboard#${activeTab}`);
-    // }, [activeTab]);
-
-
-
-
-    if (loading) return (
-        <FlexDiv classes='w-screen h-screen'>
-            <Loader />
-        </FlexDiv>
-    )
 
     return (
         <MiddlewareProvider>
-            <BaseLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+            <BaseLayout >
                 <Container>
-                    {tabs.map((tab, index) => {
-                        if (tab.name === activeTab) {
-                            return (
-                                <div key={index}>
-                                    {tab.component}
-                                </div>
-                            )
-                        }
-                    })}
+                    <Home />
                 </Container>
-
             </BaseLayout>
         </MiddlewareProvider>
     )
