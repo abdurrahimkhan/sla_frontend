@@ -78,6 +78,10 @@ export default function UserForm() {
     fetchPermissions()
   }, [])
 
+  useEffect(() => {
+    setIsSTC(rank === 'Regional' || rank === 'Governance');
+  }, [rank]);
+
   const handleSubmission = async () => {
 
     if (name === '' || mobileNumber === null || email === '' || permissionsList.length === 0 || rank === '') {
@@ -96,50 +100,41 @@ export default function UserForm() {
       const selectedIdsString = allSelectedIds.join(',');
       console.log(selectedIdsString);
 
-
-      let config = {
-        method: 'post',
-        maxBodyLength: Infinity,
-        url: `${BASE_URL}/user-request/create`,
-        headers: {
-          'Authorization': storedSession.Authorization,
-          'Content-Type': 'application/json'
-        },
-        data: {
-          name: name,
-          email: email,
-          mobileNumber: mobileNumber,
-          parentUser: storedSession.user.email,
-          permissionList: selectedIdsString,
-          rank: rank,
-          stc_employee: isSTC
-        }
-      };
-      console.log(config.data);
-
-      axios.request(config)
-        .then((response) => {
-          console.log(JSON.stringify(response));
-          setStatus(response.status);
-        })
-        .catch((error) => {
-          console.log(error);
-          if (axios.isAxiosError(error)) {
-            setErrorMessage(error.response?.data)
-            setErrorResult(true)
-            setLoading(false)
-          } else {
-            setErrorMessage('Something went wrong!')
-            setErrorResult(true)
-            setLoading(false)
+      try {
+        const res = await axios.post(
+          `${BASE_URL}/user-request/create`,
+          {
+            name: name,
+            email: email,
+            mobile_phone: mobileNumber,
+            office_phone: mobileNumber,
+            parent_user: storedSession.user.email,
+            permissions: JSON.stringify(allSelectedIds),
+            rank: rank,
+            stc_employee: isSTC,
+            requested_to: "admin@stc.com.sa"
+          },
+          {
+            headers: {
+              Authorization: 'Bearer ' + storedSession.Authorization,
+              'Content-Type': 'application/json'
+            }
           }
-        })
-        .finally(() => {
+        );
+        console.log(res);
+
+        if (res.status == 200 || res.status == 201) {
+          setStatus(200);
           setLoading(false);
           setName('');
           setMobileNumber('');
           setIsSTC(false);
-        });
+        }
+      }
+      catch (e) {
+        setStatus(500);
+        setLoading(false);
+      }
     }
   }
 
@@ -235,17 +230,31 @@ export default function UserForm() {
               </FlexDiv>
 
               <FlexDiv gapX={20} justify='start' alignment='start'>
-              <InputContainer label='Rank' required={true}>
+                {/* <InputContainer label='Rank' required={true}>
                   <input
                     onChange={(e) => setRank(e.target.value)}
                     type='text' placeholder='Enter Rank' className='w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3 pl-4' />
+                </InputContainer> */}
+
+                <InputContainer label='Rank' required={true}>
+                  <select
+                    onChange={(e) => setRank(e.target.value)}
+                    className='w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3 pl-4'
+                    defaultValue=""
+                  >
+                    <option value="" disabled>Select Rank</option>
+                    <option value="Department">Department</option>
+                    <option value="Regional">Regional</option>
+                    <option value="Governance">Governance</option>
+                    <option value="SPOC">SPOC</option>
+                  </select>
                 </InputContainer>
-              <InputContainer label='STC Employee' required={true}>
+                <InputContainer label='STC Employee' >
                   <input
                     onChange={handleCheckboxChange}
-                    type='checkbox' checked={isSTC} className="w-14 h-14 mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3" />
+                    type='checkbox' disabled checked={isSTC} className="w-14 h-14 mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3" />
                 </InputContainer>
-               
+
               </FlexDiv>
 
               <FlexDiv gapX={20} alignment='start'>
@@ -303,7 +312,7 @@ export default function UserForm() {
                   />
                 </InputContainer>
               </FlexDiv>
-              
+
 
               {
                 error &&
@@ -324,7 +333,7 @@ export default function UserForm() {
             </React.Fragment>
         }
       </FlexDiv>
-      {status === 200 && <SuccessModal heading='Success' body={'User Created successfully'} open={status === 200} close={() => window.location.href = '/dashboard#Home'} />}
+      {status === 200 && <SuccessModal heading='Success' body={'User Created successfully'} open={status === 200} />}
 
       {status === 500 && <ErrorModal heading='Something went wrong!' body={errorMessage} open={status === 500} close={() => setStatus(0)} />}
     </>

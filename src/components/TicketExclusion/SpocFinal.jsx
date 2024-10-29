@@ -25,7 +25,7 @@ export default function SpocFinalForm({ ticket_number, Exclusion_Reason, Huawei_
   
 
   const closeTicket = async () => {
-    const res = await axios.put(`${BASE_URL}/ticket/close-ticket`,
+    const res = await axios.put(`${BASE_URL}/ticket/ticket-huawei-noc-handler`,
       {
         headers: {
           Authorization: storedSession.Authorization,
@@ -33,13 +33,19 @@ export default function SpocFinalForm({ ticket_number, Exclusion_Reason, Huawei_
         },
         data: {
           ticketId: ticket_number,
-          spm: selectedExclusionReason.includes('Spare Parts') ? true : false,
+          action: "Close",
           user: storedSession.user.email,
         },
       }
     );
-
-    setStatus(200);
+    if(res.status == 200) {
+      setStatus(200);
+    }
+    else{
+      setStatus(500);
+      setErrorMessage("Something went wrong");
+    }
+    
   }
 
   const DisputeTicket = async () => {

@@ -27,7 +27,7 @@ export default function PendingTickets(
     const storedSession = JSON.parse(localStorage.getItem('session'));
 
 
-    const searchPendingTickets = async () => {
+    const searchPendingTickets = async () => { 
         setLoading(true);
 
         let config = {
