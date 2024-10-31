@@ -29,7 +29,7 @@ export default function TicketsFullView({ setOpen, sidebarOpen, setSidebarOpen }
       maxBodyLength: Infinity,
       url: `${BASE_URL}/ticket/tickets-by-status?status=Closed`,
       headers: {
-        'Authorization': storedSession.Authorization,
+        'Authorization': `Bearer ${storedSession.Authorization}`,
       }
     };
     axios.request(config)

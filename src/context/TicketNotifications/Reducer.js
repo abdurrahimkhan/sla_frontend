@@ -1,17 +1,10 @@
 const ticketReducer = (state, action) => {
     switch (action.type) {
-        case 'PROCESS_TICKET':
-            if (state.ticketCount > 0) {
-                return {
-                    ...state,
-                    ticketCount: state.ticketCount - 1
-                };
-            }
-            return state;
-        case 'UPDATE_TICKET_COUNT':
+        case 'UPDATE_TICKET_STATS':
             return {
                 ...state,
-                ticketCount: action.payload
+                mttrCount: action.payload.mttrCount,
+                ptlCount: action.payload.ptlCount
             };
         default:
             return state;

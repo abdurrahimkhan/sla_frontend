@@ -15,12 +15,12 @@ const navItems = [
     {
         icon: <IoNotificationsOutline className="text-white text-2xl font-thin" />,
         text: 'Notifications',
-        link: '/dashboard'
+        link: '/notifications'
     },
     {
         icon: <IoSearchOutline className="text-white text-2xl font-thin" />,
         text: 'Search',
-        link: '/dashboard'
+        link: '/search-ticket'
     },
     // {
     //     icon: <IoTicketOutline className="text-white text-2xl font-thin" />,
@@ -41,7 +41,7 @@ const navItems = [
     {
         icon: <FaTable className="text-white text-2xl font-thin" />,
         text: 'AllTickets',
-        link: '/dashboard'
+        link: '/all-tickets'
     }
 ]
 

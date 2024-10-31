@@ -18,17 +18,40 @@ export default function Header({ setOpen, sidebarOpen, setSidebarOpen }) {
   const [logoutVisible, setLogoutVisible] = useState(false);
   const { signOut } = useAuth();
   const storedSession = JSON.parse(localStorage.getItem('session'));
-  const { ticketCount } = useContext(TicketCountContext);
-  const items = [{
-    key: '1',
-    label: (
-      <span onClick={() => { window.location.href = '/dashboard#ViewMTTR'; }} className='text-stc-red hover:text-white py-1 w-full px-3 hover:bg-stc-red'>
-        {ticketCount} Requests ({CONTRACTOR})
-      </span>
-    )
-  }];
+  const { mttrCount, ptlCount } = useContext(TicketCountContext);
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    console.log("mttrCount", mttrCount);
+    console.log("ptlCount", ptlCount);
+    let tempItems = [];
+    if (mttrCount > 0) {
+
+      tempItems.push({
+        key: '1',
+        label: (
+          <span onClick={() => { window.location.href = '/pending-tickets/MTTR'; }} className='text-stc-red hover:text-white py-1 w-full px-3 hover:bg-stc-red'>
+            {mttrCount} MTTR Requests ({CONTRACTOR})
+          </span>
+        )
+      })
+
+    }
+    if (ptlCount > 0) {
+      tempItems.push({
+        key: '2',
+        label: (
+          <span onClick={() => { window.location.href = '/pending-tickets/PTL'; }} className='text-stc-red hover:text-white py-1 w-full px-3 hover:bg-stc-red'>
+            {ptlCount} PTL Requests ({CONTRACTOR})
+          </span>
+        )
+      })
+    }
+    setItems(tempItems);
+  }, [mttrCount, ptlCount])
 
   const logOutUser = async () => {
+    document.cookie = 'ticketCount=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     signOut();
   }
 

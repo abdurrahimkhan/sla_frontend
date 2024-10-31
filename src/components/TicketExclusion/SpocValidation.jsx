@@ -36,7 +36,7 @@ export default function SpocValidationForm({ ticket_number, Exclusion_Reason, Hu
           maxBodyLength: Infinity,
           url: `${BASE_URL}/ticket/ticket-spoc-validation-submit`,
           headers: {
-            'Authorization': storedSession.Authorization,
+            'Authorization': `Bearer ${storedSession.Authorization}`,
             'Content-Type': 'application/json'
           },
           data: {
@@ -100,7 +100,7 @@ export default function SpocValidationForm({ ticket_number, Exclusion_Reason, Hu
     const res = await axios.put(`${BASE_URL}/ticket/close-ticket`,
       {
         headers: {
-          Authorization: storedSession.Authorization,
+          Authorization: `Bearer ${storedSession.Authorization}`,
           'Content-Type': 'application/json'
         },
         data: {
@@ -120,7 +120,7 @@ export default function SpocValidationForm({ ticket_number, Exclusion_Reason, Hu
       const res = await axios.put(`${BASE_URL}/ticket/ticket-spm-validation-return`,
         {
           headers: {
-            Authorization: storedSession.Authorization,
+            Authorization: `Bearer ${storedSession.Authorization}`,
             'Content-Type': 'application/json'
           },
           data: {
@@ -146,7 +146,7 @@ export default function SpocValidationForm({ ticket_number, Exclusion_Reason, Hu
           const response = await axios.get(`${BASE_URL}/exclusion-reason/fetch-all`,
             {
               headers: {
-                Authorization: storedSession.Authorization,
+                Authorization: `Bearer ${storedSession.Authorization}`,
                 'Content-Type': 'application/json'
               }
             }

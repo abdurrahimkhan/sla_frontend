@@ -34,7 +34,7 @@ const useAuth = () => {
         }
       });
       
-      const sessionData = { user: userData.data.user, Authorization: userData.data.access_token, privileges: privileges.data };
+      const sessionData = { user: userData.data.user, Authorization: `${userData.data.access_token}`, privileges: privileges.data };
       localStorage.setItem('session', JSON.stringify(sessionData));
       setSession(sessionData);
       setStatus('authenticated');

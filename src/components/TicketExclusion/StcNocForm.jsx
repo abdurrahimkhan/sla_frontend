@@ -29,7 +29,7 @@ export default function StcNocForm({ ticket_number, currentState, requested_hour
           maxBodyLength: Infinity,
           url: `${BASE_URL}/ticket/ticket-stc-governance-accept`,
           headers: {
-            'Authorization': storedSession.Authorization,
+            'Authorization': `Bearer ${storedSession.Authorization}`,
             'Content-Type': 'application/json'
           },
           data: {
@@ -70,7 +70,7 @@ export default function StcNocForm({ ticket_number, currentState, requested_hour
           },
           {
             headers: {
-              Authorization: storedSession.Authorization,
+              Authorization: `Bearer ${storedSession.Authorization}`,
               'Content-Type': 'application/json'
             }
           }

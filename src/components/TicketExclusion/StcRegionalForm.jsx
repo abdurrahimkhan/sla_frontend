@@ -31,7 +31,7 @@ export default function StcRegionalForm(
           maxBodyLength: Infinity,
           url: `${BASE_URL}/ticket/ticket-stc-regional-accept`,
           headers: {
-            'Authorization': storedSession.Authorization,
+            'Authorization': `Bearer ${storedSession.Authorization}`,
             'Content-Type': 'application/json'
           },
           data: {
@@ -75,7 +75,7 @@ export default function StcRegionalForm(
           },
           {
             headers: {
-              Authorization: storedSession.Authorization,
+              Authorization: `Bearer ${storedSession.Authorization}`,
               'Content-Type': 'application/json'
             }
           }

@@ -47,7 +47,7 @@ export default function UserForm() {
         maxBodyLength: Infinity,
         url: `${BASE_URL}/permissions/fetch-all`,
         headers: {
-          'Authorization': storedSession.Authorization,
+          'Authorization': `Bearer ${storedSession.Authorization}`,
         }
       };
       axios.request(config)

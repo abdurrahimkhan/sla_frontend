@@ -34,7 +34,7 @@ export default function HuaDepartment({ ticket_number, currentState, requested_h
           maxBodyLength: Infinity,
           url: `${BASE_URL}/ticket/ticket-exclusion-submission`,
           headers: {
-            'Authorization': storedSession.Authorization,
+            'Authorization': `Bearer ${storedSession.Authorization}`,
             'Content-Type': 'application/json'
           },
           data: JSON.stringify({
@@ -80,7 +80,7 @@ export default function HuaDepartment({ ticket_number, currentState, requested_h
           const response = await axios.get(`${BASE_URL}/exclusion-reason/fetch-all`,
             {
               headers: {
-                Authorization: storedSession.Authorization,
+                Authorization: `Bearer ${storedSession.Authorization}`,
                 'Content-Type': 'application/json'
               }
             }

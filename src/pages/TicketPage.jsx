@@ -71,7 +71,7 @@ export default function TicketPage() {
                 maxBodyLength: Infinity,
                 url: `${BASE_URL}/ticket/fetch-tickets`,
                 headers: {
-                    'Authorization': storedSession.Authorization,
+                    'Authorization': `Bearer ${storedSession.Authorization}`,
                     'Content-Type': 'application/json'
                 },
                 data: JSON.stringify({

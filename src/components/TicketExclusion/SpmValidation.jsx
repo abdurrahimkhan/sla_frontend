@@ -32,7 +32,7 @@ export default function SpmValidation({ ticket_number, Exclusion_Reason, request
           maxBodyLength: Infinity,
           url: `${BASE_URL}/ticket/ticket-spare-parts-validation-submit`,
           headers: {
-            'Authorization': storedSession.Authorization,
+            'Authorization': `Bearer ${storedSession.Authorization}`,
             'Content-Type': 'application/json'
           },
           data: JSON.stringify({
@@ -73,7 +73,7 @@ export default function SpmValidation({ ticket_number, Exclusion_Reason, request
         maxBodyLength: Infinity,
         url: `${BASE_URL}/ticket/ticket-spare-parts-validation-return`,
         headers: {
-          'Authorization': storedSession.Authorization,
+          'Authorization': `Bearer ${storedSession.Authorization}`,
           'Content-Type': 'application/json'
         },
         data: {
@@ -109,7 +109,7 @@ export default function SpmValidation({ ticket_number, Exclusion_Reason, request
           const response = await axios.get(`${BASE_URL}/exclusion-reason/fetch-all`,
             {
               headers: {
-                Authorization: storedSession.Authorization,
+                Authorization: `Bearer ${storedSession.Authorization}`,
                 'Content-Type': 'application/json'
               }
             }

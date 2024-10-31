@@ -47,7 +47,7 @@ export default function UserProfile() {
                 maxBodyLength: Infinity,
                 url: `${BASE_URL}/user-permissions/get-permissions-by-user-id?userID=${storedSession.user.id}`,
                 headers: {
-                    'Authorization': storedSession.Authorization,
+                    'Authorization': `Bearer ${storedSession.Authorization}`,
                 }
             };
             axios.request(config)

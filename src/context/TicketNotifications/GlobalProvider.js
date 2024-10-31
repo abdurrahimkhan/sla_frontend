@@ -11,43 +11,43 @@ export const useTicket = () => {
 
 export const TicketCountProvider = ({ children }) => {
     const initialState = {
-        ticketCount: 0
+        mttrCount: 0,
+        ptlCount: 0
     };
     const [state, dispatch] = useReducer(ticketReducer, initialState);
     const storedSession = JSON.parse(localStorage.getItem('session'));
 
-    const fetchTicketCount = async () => {
-        const cookieName = 'ticketCount';
-        const cookie = document.cookie.split('; ').find(row => row.startsWith(cookieName));
+    const fetchTicketStats = async () => {
+        const cookieNameMttr = 'mttrCount';
+        const cookieNamePtl = 'ptlCount';
+        const cookieMttr = document.cookie.split('; ').find(row => row.startsWith(cookieNameMttr));
+        const cookiePtl = document.cookie.split('; ').find(row => row.startsWith(cookieNamePtl));
 
-        if (cookie) {
-            const ticketCount = parseInt(cookie.split('=')[1], 10);
-            dispatch({ type: 'UPDATE_TICKET_COUNT', payload: ticketCount });
+        if (cookieMttr && cookiePtl) {
+            const mttrCount = parseInt(cookieMttr.split('=')[1], 10);
+            const ptlCount = parseInt(cookiePtl.split('=')[1], 10);
+            dispatch({ type: 'UPDATE_TICKET_STATS', payload: { mttrCount, ptlCount } });
         } else {
             let config = {
                 method: 'get',
                 maxBodyLength: Infinity,
-                url: `${BASE_URL}/ticket/user-pending-tickets-for-action`,
+                url: `${BASE_URL}/ticket/fetch-ticket-stats-by-user`,
                 headers: {
-                    'Authorization': storedSession.Authorization,
+                    'Authorization': `Bearer ${storedSession.Authorization}`,
                     'Content-Type': 'application/json'
-                },
-                params: {
-                    user_id: storedSession.user.id,
                 }
             };
 
             try {
                 const response = await axios.request(config);
-                const tickets = response.data;
-                const ticketCount = tickets.data.length;
-                // Update the ticket count with the number of pending tickets
-                dispatch({ type: 'UPDATE_TICKET_COUNT', payload: ticketCount });
+                console.log(response.data.data);
+                const { mttr, ptl } = response.data.data;
+                dispatch({ type: 'UPDATE_TICKET_STATS', payload: { mttrCount: mttr, ptlCount: ptl } });
 
-                // Set a cookie with the ticket count and expiry time of 5 minutes
                 const expiryDate = new Date();
-                expiryDate.setTime(expiryDate.getTime() + (5 * 60 * 1000)); // 5 minutes
-                document.cookie = `${cookieName}=${ticketCount}; expires=${expiryDate.toUTCString()}; path=/`;
+                expiryDate.setTime(expiryDate.getTime() + (1 * 60 * 1000)); // 1 minute
+                document.cookie = `${cookieNameMttr}=${mttr}; expires=${expiryDate.toUTCString()}; path=/`;
+                document.cookie = `${cookieNamePtl}=${ptl}; expires=${expiryDate.toUTCString()}; path=/`;
             } catch (error) {
                 console.error(error);
             }
@@ -55,25 +55,23 @@ export const TicketCountProvider = ({ children }) => {
     };
 
     const processTicket = () => {
-        dispatch({ type: 'PROCESS_TICKET' });
+        // Delete the cookies
+        document.cookie = 'mttrCount=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        document.cookie = 'ptlCount=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
 
-        // Update the cookie with the new ticket count
-        const cookieName = 'ticketCount';
-        const ticketCount = state.ticketCount - 1;
-        const expiryDate = new Date();
-        expiryDate.setTime(expiryDate.getTime() + (5 * 60 * 1000)); // 5 minutes
-        document.cookie = `${cookieName}=${ticketCount}; expires=${expiryDate.toUTCString()}; path=/`;
+        fetchTicketStats();  
     }
 
     useEffect(() => {
         if (storedSession) {
-            fetchTicketCount();
+            fetchTicketStats();
         }
     }, []);
 
     return (
         <TicketCountContext.Provider value={{
-            ticketCount: state.ticketCount,
+            mttrCount: state.mttrCount,
+            ptlCount: state.ptlCount,
             processTicket
         }}>
             {children}

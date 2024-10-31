@@ -31,7 +31,7 @@ export default function SearchTicket() {
                 },
                 {
                     'headers': {
-                        'authorization': storedSession.Authorization,
+                        'Authorization': `Bearer ${storedSession.Authorization}`,
                         'Content-Type': 'application/json'
                     }
                 }

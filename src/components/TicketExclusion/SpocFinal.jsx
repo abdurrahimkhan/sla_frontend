@@ -28,7 +28,7 @@ export default function SpocFinalForm({ ticket_number, Exclusion_Reason, Huawei_
     const res = await axios.put(`${BASE_URL}/ticket/ticket-huawei-noc-handler`,
       {
         headers: {
-          Authorization: storedSession.Authorization,
+          Authorization: `Bearer ${storedSession.Authorization}`,
           'Content-Type': 'application/json'
         },
         data: {
@@ -54,7 +54,7 @@ export default function SpocFinalForm({ ticket_number, Exclusion_Reason, Huawei_
       const res = await axios.put(`${BASE_URL}/ticket/ticket-spm-validation-return`,
         {
           headers: {
-            Authorization: storedSession.Authorization,
+            Authorization: `Bearer ${storedSession.Authorization}`,
             'Content-Type': 'application/json'
           },
           data: {

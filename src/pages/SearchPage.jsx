@@ -2,14 +2,14 @@ import React from 'react'
 import MiddlewareProvider from '../middleware/AuthMiddleware'
 import BaseLayout from '../components/BaseLayout/BaseLayout'
 import Container from '../components/Common/Container'
-import TicketsFullView from '../components/Tables/TicketsFullView'
+import SearchTicket from '../components/TicketManagement/SearchTicket/SearchTicket'
 
-export default function AllTicketsPage() {
+export default function SearchPage() {
   return (
     <MiddlewareProvider>
       <BaseLayout >
         <Container>
-          <TicketsFullView />
+          <SearchTicket />
         </Container>
       </BaseLayout>
     </MiddlewareProvider>

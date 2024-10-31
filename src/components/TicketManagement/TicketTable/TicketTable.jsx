@@ -306,7 +306,12 @@ const TicketsTable = ({ data, searchTicket }) => {
       </FlexDiv>
       <div className='w-full overflow-x-scroll'>
         <div className='w-[4050px] '>
-          <Table columns={columns} dataSource={data} pagination={{ position: ['bottomLeft'] }} rowClassName={'cursor-pointer'}
+          <Table 
+            columns={columns} 
+            dataSource={data} 
+            pagination={{ position: ['bottomLeft'] }} 
+            rowClassName={'cursor-pointer'}
+            rowKey={(record) => record.PR_ID} // Added rowKey to ensure each row has a unique key
             onRow={(record, index) => {
               return {
                 onClick: () => {

@@ -44,7 +44,7 @@ const CalendarComponent = () => {
       maxBodyLength: Infinity,
       url: `${BASE_URL}/ticket/tickets-by-closed-date?closed_date=${value.format('YYYY-MM-DD')}`,
       headers: {
-        'Authorization': storedSession.Authorization,
+        'Authorization': `Bearer ${storedSession.Authorization}`,
         'Content-Type': 'application/json'
       },
     };

@@ -16,7 +16,7 @@ import ErrorResult from '../../Common/ErrorResult';
 export default function PendingTickets(
     { notification, type }
 ) {
-    console.log("PT");
+    console.log(type);
     const [tickets, setTickets] = useState();
     const [loading, setLoading] = useState(true);
     // const { data: session } = useSession();
@@ -27,55 +27,103 @@ export default function PendingTickets(
     const storedSession = JSON.parse(localStorage.getItem('session'));
 
 
-    const searchPendingTickets = async () => { 
-
-        let config = {
-            method: 'get',
-            maxBodyLength: Infinity,
-            url: `${BASE_URL}/ticket/user-pending-tickets-for-action`,
-            headers: {
-                'Authorization': storedSession.Authorization,
-                'Content-Type': 'application/json'
-            },
-            params: {
-                user_id: storedSession.user.id,
-            }
-        };
-
-        axios.request(config)
-            .then((response) => {
-                console.log(JSON.stringify(response.data));
-                if (notification) {
-                    setTickets(response.data.data);
-                    setLoading(false);
+    const searchPendingTickets = async () => {
+        if (type === 'Both') {
+            const config = {
+                method: 'get',
+                maxBodyLength: Infinity,
+                url: `${BASE_URL}/view/get-user-filtered-data-from-view`,
+                headers: {
+                    'Authorization': `Bearer ${storedSession.Authorization}`,
+                    'Content-Type': 'application/json'
+                },
+                params: {
+                    view_name: 'tickets_full_view',
+                    columns: `MTTR_PassFail,PTL_PASSFAIL`,
+                    values: 'Fail,Fail',
+                    expression: '=,=',
+                    condition: 'OR'
                 }
-                else {
-                    setTickets(response.data.data);
-                    setLoading(false);
-                }
-            })
-            .catch((error) => {
-                console.log(error);
-                if (axios.isAxiosError(error)) {
-                    console.log(error)
-                    setErrorMessage(!error.response.data)
-                    setErrorResult(true)
+            };
+
+            axios.request(config)
+                .then((response) => {
+                    console.log(JSON.stringify(response.data));
+                    if (notification) {
+                        setTickets(response.data.data);
+                        setLoading(false);
+                    }
+                    else {
+                        setTickets(response.data.data);
+                        setLoading(false);
+                    }
+                })
+                .catch((error) => {
+                    console.log(error);
+                    if (axios.isAxiosError(error)) {
+                        console.log(error)
+                        setErrorMessage(!error.response.data)
+                        setErrorResult(true)
+                        setLoading(false)
+                    } else {
+                        setErrorMessage('Something went wrong!')
+                        setErrorResult(true)
+                        setLoading(false)
+                    }
+                })
+                .finally(() => {
                     setLoading(false)
-                } else {
-                    setErrorMessage('Something went wrong!')
-                    setErrorResult(true)
-                    setLoading(false)
+                });
+        } else {
+            const config = {
+                method: 'get',
+                maxBodyLength: Infinity,
+                url: `${BASE_URL}/view/get-user-filtered-data-from-view`,
+                headers: {
+                    'Authorization': `Bearer ${storedSession.Authorization}`,
+                    'Content-Type': 'application/json'
+                },
+                params: {
+                    view_name: 'tickets_full_view',
+                    columns: `${type.toUpperCase()}_PassFail`,
+                    values: 'Fail',
+                    expression: '='
                 }
-            })
-            .finally(() => {
-                setLoading(false)
-            });
+            };
 
+            axios.request(config)
+                .then((response) => {
+                    console.log(JSON.stringify(response.data));
+                    if (notification) {
+                        setTickets(response.data.data);
+                        setLoading(false);
+                    } else {
+                        setTickets(response.data.data);
+                        setLoading(false);
+                    }
+                })
+                .catch((error) => {
+                    console.log(error);
+                    if (axios.isAxiosError(error)) {
+                        console.log(error);
+                        setErrorMessage(!error.response.data);
+                        setErrorResult(true);
+                        setLoading(false);
+                    } else {
+                        setErrorMessage('Something went wrong!');
+                        setErrorResult(true);
+                        setLoading(false);
+                    }
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        }
     }
 
 
     useEffect(() => {
-        if (storedSession && !tickets) {
+        if (storedSession && !tickets && type) {
             searchPendingTickets();
         } else {
             navigate(`/`);
