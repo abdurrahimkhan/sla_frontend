@@ -10,6 +10,7 @@ import CalendarPage from "../pages/CalendarPage"
 import UserProfilePage from "../pages/ProfilePage"
 import AllTicketsPage from "../pages/AllTickets"
 import SearchPage from "../pages/SearchPage"
+import Worklog from "../pages/Worklog"
 // import withAuth from "../middleware/AuthMiddleware"
 
 export default function WebRouter() {
@@ -23,6 +24,7 @@ export default function WebRouter() {
         { path: '/profile', element: <UserProfilePage /> },
         { path: '/feedback-form', element: <UserProfilePage /> },
         { path: '/all-tickets', element: <AllTicketsPage /> },
+        { path: '/worklog/:pr_id', element: <Worklog /> },
         { path: '/ticket/:pr_id', element: <TicketPage /> },
         { path: '/ticket/view/:pr_id', element: <ViewTicket /> },
         { path: '/search-ticket', element: <SearchPage /> },

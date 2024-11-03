@@ -24,12 +24,12 @@ export default function Worklog({ setOpen, sidebarOpen, setSidebarOpen }) {
   const navigate = useNavigate();
 
   const getWorklogOfTicket = async () => {
-    const res = await axios.put(
-        `${BASE_URL}/ticket/ticket-partial-acceptance-handler`,
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/worklog/fetch-tickets`,
         {
-          ticketId: '',
-          action: "Close",
-          user: storedSession.user.email,
+          prID: 'PR00027373505',
+          user: storedSession.user.email
         },
         {
           headers: {
@@ -38,7 +38,24 @@ export default function Worklog({ setOpen, sidebarOpen, setSidebarOpen }) {
           }
         }
       );
-    //   making loading false
+      const data = response.data.data;
+      if (response.data.count > 0) {
+        const columns = Object.keys(data[0]).map(key => ({
+          field: key,
+          headerName: key.charAt(0).toUpperCase() + key.slice(1), // Capitalize headers
+          filter: 'agSetColumnFilter'
+        }));
+        setColumnDefs(columns);
+      }
+      setRowData(data);
+      setTotalCount(response.data.count);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+      setStatus(500);
+    }
+
   }
 
 
@@ -50,7 +67,7 @@ export default function Worklog({ setOpen, sidebarOpen, setSidebarOpen }) {
 
   if (loading) return (
     <FlexDiv classes='w-[calc(100vw-300px)] h-[calc(100vh-200px)]'>
-      {/* <Loader /> */}
+      <Loader />
     </FlexDiv>
   )
 

@@ -105,48 +105,6 @@ export default function TicketPage() {
                 setLoading(false)
             }
 
-            // let config = {
-            //     method: 'post',
-            //     maxBodyLength: Infinity,
-            //     url: `${BASE_URL}/ticket/fetch-tickets`,
-            //     headers: {
-            //         'Authorization': `Bearer ${storedSession.Authorization}`,
-            //         'Content-Type': 'application/json'
-            //     },
-            //     data: JSON.stringify({
-            //         prIDs: pr_id
-            //     })
-            // };
-
-            // axios.request(config)
-            //     .then((response) => {
-            //         console.log(JSON.stringify(response.data));
-            //         console.log("tickepage");
-            //         setTicket(response.data.data[0]);
-            //         const tempData = []
-
-            //         Object.entries(response.data.data[0]).forEach(([key, value]) => {
-            //             console.log(key, value);
-            //             // key = key.replaceAll('Contractor', CONTRACTOR);
-            //             tempData.push({
-            //                 description: key.replaceAll('_', ' '),
-            //                 value: value
-            //             });
-            //         });
-            //         setData(tempData);
-            //         setLoading(false);
-            //     })
-            //     .catch((error) => {
-            //         console.log(error);
-            //         if (error.response.status == 403) {
-            //             alert("Session expired, Kindly Login Again.");
-            //             signOut();
-            //         }
-            //         setErrorMessage(error.response.data)
-            //         setErrorResult(true)
-            //         setLoading(false)
-            //     });
-
         } else {
             alert("No Session, Kindly Login.");
             navigate(`/`);

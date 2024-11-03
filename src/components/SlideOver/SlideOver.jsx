@@ -1,6 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { MdClose } from 'react-icons/md';
+import { BASE_URL } from '../../constants/constants';
 
 
 
@@ -65,11 +66,17 @@ export default function SlideOver({ open, setOpen, links }) {
                     </div>
                   </Transition.Child>
                   <div className="flex h-full flex-col justify-between overflow-y-scroll w-full bg-[#ff375e] text-white py-6 shadow-xl px-4">
-                    {links ? '':
-                      <span className='font-medium text-lg'>
-                        No Links Provided for this page
-                      </span>
-                    }
+                    <a
+                      href="#"
+                      target="_blank"
+                      className="bg-[#6c37ff] font-medium text-white px-3 py-2 rounded-md"
+                      onClick={(event) => {
+                        event.preventDefault();  // Prevent default behavior
+                        window.open(`http://localhost:3000/worklog/${window.location.pathname.split('/')[2]}`, '_blank'); // Open in new tab
+                      }}
+                    >
+                      SLA Worklog
+                    </a>
                   </div>
                 </Dialog.Panel>
               </Transition.Child>
