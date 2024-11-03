@@ -1,9 +1,11 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { SearchOutlined } from '@ant-design/icons';
 // import type { GetRef, TableColumnsType, TableColumnType } from 'antd';
 import { Button, ConfigProvider, Input, Space, Table } from 'antd';
 // import type { FilterDropdownProps } from 'antd/es/table/interface';
 import Highlighter from 'react-highlight-words';
+import axios from 'axios';
+import { BASE_URL } from '../../../constants/constants';
 
 
 
@@ -11,6 +13,28 @@ const TicketView = ({ data }) => {
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
+    const [data1, setData] = useState();
+    const storedSession = JSON.parse(localStorage.getItem('session'));
+
+    useEffect(() => {
+        console.log(data[0]['value']);
+        const getTicketDetails = async () => {
+            const res = await axios.get(
+                `${BASE_URL}/view/get-user-filtered-data-from-view`,
+                {
+                    headers: {
+                        'Authorization': 'Bearer ' + storedSession.Authorization,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+            console.log(res);
+        }
+
+        getTicketDetails();
+
+    }, []);
+
 
     const handleSearch = (
         selectedKeys,
@@ -32,7 +56,7 @@ const TicketView = ({ data }) => {
         setSearchText('');
     };
 
-    const getColumnSearchProps = (dataIndex)=> ({
+    const getColumnSearchProps = (dataIndex) => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
             <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
                 <Input
@@ -144,7 +168,7 @@ const TicketView = ({ data }) => {
                 </Space>
             }
             <div className='w-full'>
-                <Table  columns={columns} dataSource={data} pagination={false} rowClassName={'capitalize'} />
+                <Table columns={columns} dataSource={data} sticky pagination={false} rowClassName={'capitalize'} />
             </div>
         </ConfigProvider>
     )

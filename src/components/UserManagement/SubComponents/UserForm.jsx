@@ -129,6 +129,9 @@ export default function UserForm() {
           setName('');
           setMobileNumber('');
           setIsSTC(false);
+        } else {
+          setStatus(500);
+          setLoading(false);
         }
       }
       catch (e) {
@@ -333,7 +336,7 @@ export default function UserForm() {
             </React.Fragment>
         }
       </FlexDiv>
-      {status === 200 && <SuccessModal heading='Success' body={'User Created successfully'} open={status === 200} />}
+      {status === 200 && <SuccessModal heading='Success' body={'User Created successfully'} open={status === 200} close={() => setStatus(0)}/>}
 
       {status === 500 && <ErrorModal heading='Something went wrong!' body={errorMessage} open={status === 500} close={() => setStatus(0)} />}
     </>

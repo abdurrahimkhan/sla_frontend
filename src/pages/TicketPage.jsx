@@ -20,6 +20,7 @@ import HuaDepartment from '../components/TicketExclusion/HuaDepartment';
 import SpocValidationForm from '../components/TicketExclusion/SpocValidation';
 import SpmValidation from '../components/TicketExclusion/SpmValidation';
 import SpocFinalForm from '../components/TicketExclusion/SpocFinal';
+import HuaNocForm from '../components/TicketExclusion/HuaNoc';
 
 
 
@@ -66,47 +67,85 @@ export default function TicketPage() {
 
         if (storedSession) {
 
-            let config = {
-                method: 'post',
-                maxBodyLength: Infinity,
-                url: `${BASE_URL}/ticket/fetch-tickets`,
-                headers: {
-                    'Authorization': `Bearer ${storedSession.Authorization}`,
-                    'Content-Type': 'application/json'
-                },
-                data: JSON.stringify({
-                    prIDs: pr_id
-                })
-            };
-
-            axios.request(config)
-                .then((response) => {
-                    console.log(JSON.stringify(response.data));
-                    console.log("tickepage");
-                    setTicket(response.data.data[0]);
-                    const tempData = []
-
-                    Object.entries(response.data.data[0]).forEach(([key, value]) => {
-                        console.log(key, value);
-                        // key = key.replaceAll('Contractor', CONTRACTOR);
-                        tempData.push({
-                            description: key.replaceAll('_', ' '),
-                            value: value
-                        });
-                    });
-                    setData(tempData);
-                    setLoading(false);
-                })
-                .catch((error) => {
-                    console.log(error);
-                    if (error.response.status == 403) {
-                        alert("Session expired, Kindly Login Again.");
-                        signOut();
+            try {
+                const response = await axios.get(`${BASE_URL}/view/get-filtered-data-from-view`, {
+                    params: {
+                        view_name: 'Tickets_Full_View',
+                        columns: 'PR_ID',
+                        values: pr_id,
+                        expression: '='
+                    },
+                    headers: {
+                        Authorization: `Bearer ${storedSession.Authorization}`,
+                        'Content-Type': 'application/json'
                     }
-                    setErrorMessage(error.response.data)
-                    setErrorResult(true)
-                    setLoading(false)
                 });
+                console.log(response);
+                console.log(response.data.data[0]);
+                const tempData = []
+                Object.entries(response.data.data[0]).forEach(([key, value]) => {
+                    console.log(key, value);
+                    // key = key.replaceAll('Contractor', CONTRACTOR);
+                    tempData.push({
+                        description: key.replaceAll('_', ' '),
+                        value: value
+                    });
+                });
+                setData(tempData);
+                setTicket(response.data.data[0]);
+                setLoading(false);
+            } catch (error) {
+                console.log(error);
+                // if (error.response.status == 403) {
+                //     alert("Session expired, Kindly Login Again.");
+                //     signOut();
+                // }
+                // setErrorMessage(error.response.data)
+                setErrorResult(true)
+                setLoading(false)
+            }
+
+            // let config = {
+            //     method: 'post',
+            //     maxBodyLength: Infinity,
+            //     url: `${BASE_URL}/ticket/fetch-tickets`,
+            //     headers: {
+            //         'Authorization': `Bearer ${storedSession.Authorization}`,
+            //         'Content-Type': 'application/json'
+            //     },
+            //     data: JSON.stringify({
+            //         prIDs: pr_id
+            //     })
+            // };
+
+            // axios.request(config)
+            //     .then((response) => {
+            //         console.log(JSON.stringify(response.data));
+            //         console.log("tickepage");
+            //         setTicket(response.data.data[0]);
+            //         const tempData = []
+
+            //         Object.entries(response.data.data[0]).forEach(([key, value]) => {
+            //             console.log(key, value);
+            //             // key = key.replaceAll('Contractor', CONTRACTOR);
+            //             tempData.push({
+            //                 description: key.replaceAll('_', ' '),
+            //                 value: value
+            //             });
+            //         });
+            //         setData(tempData);
+            //         setLoading(false);
+            //     })
+            //     .catch((error) => {
+            //         console.log(error);
+            //         if (error.response.status == 403) {
+            //             alert("Session expired, Kindly Login Again.");
+            //             signOut();
+            //         }
+            //         setErrorMessage(error.response.data)
+            //         setErrorResult(true)
+            //         setLoading(false)
+            //     });
 
         } else {
             alert("No Session, Kindly Login.");
@@ -169,6 +208,18 @@ export default function TicketPage() {
                                         ticket && ticket?.Exclusion_Status === 'SPM Validation' ? (
                                             <CollapseComponent headerText='SPM Validation'>
                                                 <SpmValidation
+                                                    ticket_number={ticket?.PR_ID}
+                                                    Exclusion_Reason={ticket?.Exclusion_Reason}
+                                                    Huawei_Remarks={ticket?.Huawei_Remarks}
+                                                    requested_hours={ticket?.Exclusion_Time}
+                                                />
+                                            </CollapseComponent>
+                                        ) : null
+                                    }
+                                    {
+                                        ticket && ticket?.Exclusion_Status === 'HUA NOC' ? (
+                                            <CollapseComponent headerText='HUA NOC'>
+                                                <HuaNocForm
                                                     ticket_number={ticket?.PR_ID}
                                                     Exclusion_Reason={ticket?.Exclusion_Reason}
                                                     Huawei_Remarks={ticket?.Huawei_Remarks}
@@ -242,7 +293,7 @@ export default function TicketPage() {
                                 <ContractorInfo
                                     ticket_number={ticket?.PR_ID}
                                     restoration_duration={ticket?.Restoration_Duration}
-                                    request_type={ticket?.SLA_Type}
+                                    request_type={ticket?.sla_category}
                                     requested_time={ticket?.Exclusion_Time}
                                     exclusion_reason={ticket?.Exclusion_Reason}
                                     exclusion_remarks={ticket?.Huawei_Remarks}

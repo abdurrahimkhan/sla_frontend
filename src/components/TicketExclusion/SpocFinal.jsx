@@ -22,46 +22,48 @@ export default function SpocFinalForm({ ticket_number, Exclusion_Reason, Huawei_
   const { session, signOut } = useAuth();
   console.log(selectedExclusionReason);
   console.log(Exclusion_Reason);
-  
+
 
   const closeTicket = async () => {
-    const res = await axios.put(`${BASE_URL}/ticket/ticket-huawei-noc-handler`,
+    const res = await axios.put(
+      `${BASE_URL}/ticket/ticket-partial-acceptance-handler`,
+      {
+        ticketId: ticket_number,
+        action: "Close",
+        user: storedSession.user.email,
+      },
       {
         headers: {
           Authorization: `Bearer ${storedSession.Authorization}`,
           'Content-Type': 'application/json'
-        },
-        data: {
-          ticketId: ticket_number,
-          action: "Close",
-          user: storedSession.user.email,
-        },
+        }
       }
     );
-    if(res.status == 200) {
+    if (res.status == 200) {
       setStatus(200);
     }
-    else{
+    else {
       setStatus(500);
       setErrorMessage("Something went wrong");
     }
-    
+
   }
 
   const DisputeTicket = async () => {
     if (remarks !== '') {
       // return to spm guy
-      const res = await axios.put(`${BASE_URL}/ticket/ticket-spm-validation-return`,
+      const res = await axios.put(
+        `${BASE_URL}/ticket/ticket-partial-acceptance-handler`,
+        {
+          ticketId: ticket_number,
+          action: "Dispute",
+          user: storedSession.user.email,
+        },
         {
           headers: {
             Authorization: `Bearer ${storedSession.Authorization}`,
             'Content-Type': 'application/json'
-          },
-          data: {
-            ticketId: ticket_number,
-            spm: selectedExclusionReason.includes('Spare Parts') ? true : false,
-            user: storedSession.user.email,
-          },
+          }
         }
       );
 
@@ -75,7 +77,7 @@ export default function SpocFinalForm({ ticket_number, Exclusion_Reason, Huawei_
   useEffect(() => {
 
     if (storedSession) {
-      
+
     }
   }, [])
 
@@ -93,7 +95,7 @@ export default function SpocFinalForm({ ticket_number, Exclusion_Reason, Huawei_
         <button onClick={closeTicket} className='bg-stc-red shadow-lg text-white py-2 px-3 rounded-md'>Close</button>
       </FlexDiv>
 
-    
+
 
       {status === 200 && <SuccessModal heading='Success' body={'Response submitted successfully'} open={status === 200} close={() => window.location.href = '/dashboard#Home'} />}
 

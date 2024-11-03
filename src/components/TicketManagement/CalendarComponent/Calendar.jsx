@@ -19,7 +19,7 @@ const CalendarComponent = () => {
   const [status, setStatus] = React.useState(0);
   const storedSession = JSON.parse(localStorage.getItem('session'));
   const [errorMessage, setErrorMessage] = React.useState('');
-  const [slaDetails ,setSlaDetails] = React.useState('');
+  const [slaDetails, setSlaDetails] = React.useState('');
   // const [errorResult, setErrorResult] = React.useState(false);
 
 
@@ -32,44 +32,73 @@ const CalendarComponent = () => {
   }, []);
 
 
-  const handleSelect = (value, selectInfo) => {
+  const handleSelect = async (value, selectInfo) => {
     console.log(value.format('YYYY-MM-DD'), selectInfo);
     if (selectInfo.source !== 'date') {
       return;
     }
-    
-
-    let config = {
-      method: 'get',
-      maxBodyLength: Infinity,
-      url: `${BASE_URL}/ticket/tickets-by-closed-date?closed_date=${value.format('YYYY-MM-DD')}`,
-      headers: {
-        'Authorization': `Bearer ${storedSession.Authorization}`,
-        'Content-Type': 'application/json'
-      },
-    };
-
-    axios.request(config)
-      .then((response) => {
-        setSlaDetails(response.data.count);
-        setStatus(200);
-        
-      })
-      .catch((error) => {
-        console.log(error);
-        if (axios.isAxiosError(error)) {
-          console.log(error)
-          setErrorMessage(!error.response.data)
-          // setErrorResult(true)
-          setStatus(500)
-          setLoading(false)
-        } else {
-          setErrorMessage('Something went wrong!')
-          // setErrorResult(true)
-          setStatus(500)
-          setLoading(false)
+    console.log("hit here");
+    try {
+      const response = await axios.get(`${BASE_URL}/ticket/fetch-ticket-stats-by-date?date=${value.format('YYYY-MM-DD')}`, {
+        headers: {
+          Authorization: `Bearer ${storedSession.Authorization}`,
+          'Content-Type': 'application/json'
         }
       });
+      console.log(response);
+      console.log(response.data.data);
+      const dataArray = Object.entries(response.data.data)
+
+      const TicketsSummary = dataArray.map(([key, value]) => (
+        <div key={key}>
+          {key.charAt(0).toUpperCase() + key.slice(1)}: {value}
+        </div>
+      ))
+      setSlaDetails(TicketsSummary);
+      setStatus(200);
+
+    } catch (error) {
+      console.log(error);
+
+      setErrorMessage('Something went wrong!')
+      // setErrorResult(true)
+      setStatus(500)
+      setLoading(false)
+
+    }
+
+
+    // let config = {
+    //   method: 'get',
+    //   maxBodyLength: Infinity,
+    //   url: `${BASE_URL}/ticket/fetch-ticket-stats-by-date?date=${value.format('YYYY-MM-DD')}`,
+    //   headers: {
+    //     'Authorization': `Bearer ${storedSession.Authorization}`,
+    //     'Content-Type': 'application/json'
+    //   },
+    // };
+
+    // axios.request(config)
+    //   .then((response) => {
+    //     setSlaDetails(response.data.count);
+    //     setStatus(200);
+
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //     if (axios.isAxiosError(error)) {
+    //       console.log(error)
+    //       setErrorMessage(!error.response.data)
+    //       // setErrorResult(true)
+    //       setStatus(500)
+    //       setLoading(false)
+    //     } else {
+    //       setErrorMessage('Something went wrong!')
+    //       // setErrorResult(true)
+    //       setStatus(500)
+    //       setLoading(false)
+    //     }
+    //   });
 
 
   };
@@ -130,7 +159,7 @@ const CalendarComponent = () => {
         </div>
       </ConfigProvider>
 
-      {status === 200 && <SuccessModal heading='Success' body={slaDetails} open={status === 200} close={() => {setStatus(0); setSlaDetails('')} } />}
+      {status === 200 && <SuccessModal heading='Success' body={slaDetails} open={status === 200} close={() => { setStatus(0); setSlaDetails('') }} />}
 
       {status === 500 && <ErrorModal heading='Something went wrong!' body={errorMessage} open={status === 500} close={() => setStatus(0)} />}
 

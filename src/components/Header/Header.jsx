@@ -51,7 +51,8 @@ export default function Header({ setOpen, sidebarOpen, setSidebarOpen }) {
   }, [mttrCount, ptlCount])
 
   const logOutUser = async () => {
-    document.cookie = 'ticketCount=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'mttrCount=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'ptlCount=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     signOut();
   }
 
