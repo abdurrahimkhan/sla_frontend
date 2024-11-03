@@ -24,11 +24,12 @@ export default function Worklog({ setOpen, sidebarOpen, setSidebarOpen }) {
   const navigate = useNavigate();
 
   const getWorklogOfTicket = async () => {
+    const pr_id = window.location.pathname.split('/').pop();
     try {
       const response = await axios.post(
         `${BASE_URL}/worklog/fetch-tickets`,
         {
-          prID: 'PR00027373505',
+          prID: pr_id,
           user: storedSession.user.email
         },
         {
