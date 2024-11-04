@@ -26,12 +26,8 @@ export default function Worklog({ setOpen, sidebarOpen, setSidebarOpen }) {
   const getWorklogOfTicket = async () => {
     const pr_id = window.location.pathname.split('/').pop();
     try {
-      const response = await axios.post(
-        `${BASE_URL}/worklog/fetch-tickets`,
-        {
-          prID: pr_id,
-          user: storedSession.user.email
-        },
+      const response = await axios.get(
+        `${BASE_URL}/worklog/fetch-ticket-worklog?ticketId=${pr_id}`,
         {
           headers: {
             Authorization: 'Bearer ' + storedSession.Authorization,

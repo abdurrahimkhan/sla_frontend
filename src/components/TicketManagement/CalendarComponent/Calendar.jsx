@@ -34,7 +34,13 @@ const CalendarComponent = () => {
 
   const handleSelect = async (value, selectInfo) => {
     console.log(value.format('YYYY-MM-DD'), selectInfo);
+    const today = new Date();
     if (selectInfo.source !== 'date') {
+      return;
+    }
+    if(value.isAfter(today)) {
+      setStatus(500);
+      setErrorMessage("You entered Date greater than Today");
       return;
     }
     console.log("hit here");

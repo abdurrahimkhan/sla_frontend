@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { MdClose } from 'react-icons/md';
-import { BASE_URL } from '../../constants/constants';
+import { BASE_URL, SideBarLinks } from '../../constants/constants';
 
 
 
@@ -14,7 +14,12 @@ function titleCase(str) {
 
 
 export default function SlideOver({ open, setOpen, links }) {
+  const [hasMatchingSubstring, setHasMatchingSubstring] = useState(false);
 
+  useEffect(() => {
+    const url = window.location.href;
+    setHasMatchingSubstring(SideBarLinks.some(substring => url.includes(substring)));
+  }, [])
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -66,17 +71,23 @@ export default function SlideOver({ open, setOpen, links }) {
                     </div>
                   </Transition.Child>
                   <div className="flex h-full flex-col justify-between overflow-y-scroll w-full bg-[#ff375e] text-white py-6 shadow-xl px-4">
-                    <a
-                      href="#"
-                      target="_blank"
-                      className="bg-[#6c37ff] font-medium text-white px-3 py-2 rounded-md"
-                      onClick={(event) => {
-                        event.preventDefault();  // Prevent default behavior
-                        window.open(`http://localhost:3000/worklog/${window.location.pathname.split('/')[2]}`, '_blank'); // Open in new tab
-                      }}
-                    >
-                      SLA Worklog
-                    </a>
+                    {
+                      hasMatchingSubstring ?
+                        <a
+                          href="#"
+                          target="_blank"
+                          className="bg-purple font-medium text-white px-3 py-2 rounded-md"
+                          onClick={(event) => {
+                            event.preventDefault();  // Prevent default behavior
+                            window.open(`http://localhost:3000/worklog/${window.location.pathname.split('/')[2]}`, '_blank'); // Open in new tab
+                          }}
+                        >
+                          SLA Worklog
+                        </a> :
+                        "No Link added on this Page"
+                    }
+
+
                   </div>
                 </Dialog.Panel>
               </Transition.Child>
