@@ -5,16 +5,16 @@ import Loader from '../components/Common/Loader';
 import { PORTAL_NAME } from '../constants/constants';
 import useAuth from '../auth/useAuth'
 import { useNavigate } from 'react-router-dom';
+import Cookie from "js-cookie";
 
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const { session, status, signIn } = useAuth();
+  const { status, signIn } = useAuth();
   const navigate = useNavigate();
-
-
+  const session = Cookie.get("session");
 
   const handleUsernameChange = (e) => {
     setEmail(e.target.value);
@@ -28,6 +28,16 @@ export default function Login() {
       setLoading(false);
     }
   }, [status])
+
+  useEffect(() => {
+
+    if (session) {
+      navigate(`/dashboard`);
+    }
+    else {
+      navigate('/');
+    }
+  }, [])
 
 
   const handlePasswordChange = (e) => {
@@ -79,7 +89,7 @@ export default function Login() {
       <div className="hold-transition login-page">
         <div className="login-box ">
           <div className="login-logo flex flex-col gap-y-4 items-center">
-            <img width={312} height={160} src="/images/stclogologin.png" alt="STC Logo" style={{ opacity: ".8" }} />
+            <img width={312} height={160} src="/sla/images/stclogologin.png" alt="STC Logo" style={{ opacity: ".8" }} />
             <a className='font-bold' href="/">{PORTAL_NAME}</a>
           </div>
           <div className="card">

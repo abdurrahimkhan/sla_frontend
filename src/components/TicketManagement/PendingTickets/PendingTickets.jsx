@@ -7,6 +7,7 @@ import Loader from '../../Common/Loader';
 import { TICKET_PERMISSIONS } from '../../../lib/permissions';
 // import { useSession } from 'next-auth/react';
 import useAuth from '../../../auth/useAuth';
+import Cookie from "js-cookie";
 import { useNavigate } from 'react-router-dom';
 import { BASE_URL } from '../../../constants/constants';
 import ErrorResult from '../../Common/ErrorResult';
@@ -20,104 +21,78 @@ export default function PendingTickets(
     const [tickets, setTickets] = useState();
     const [loading, setLoading] = useState(true);
     // const { data: session } = useSession();
-    const { session, signOut } = useAuth();
+    // const { session, signOut } = useAuth();
     const [errorMessage, setErrorMessage] = useState('')
     const [errorResult, setErrorResult] = useState(false);
     const navigate = useNavigate();
-    const storedSession = JSON.parse(localStorage.getItem('session'));
+    const session = Cookie.get("session");
+    const storedSession = JSON.parse(session);
 
 
     const searchPendingTickets = async () => {
         if (type === 'Both') {
-            const config = {
-                method: 'get',
-                maxBodyLength: Infinity,
-                url: `${BASE_URL}/view/get-user-filtered-data-from-view`,
-                headers: {
-                    'Authorization': `Bearer ${storedSession.Authorization}`,
-                    'Content-Type': 'application/json'
-                },
-                params: {
-                    view_name: 'tickets_full_view',
-                    columns: `MTTR_PassFail,PTL_PASSFAIL`,
-                    values: 'Fail,Fail',
-                    expression: '=,=',
-                    condition: 'OR'
-                }
-            };
-
-            axios.request(config)
-                .then((response) => {
-                    console.log(JSON.stringify(response.data));
-                    if (notification) {
-                        setTickets(response.data.data);
-                        setLoading(false);
-                    }
-                    else {
-                        setTickets(response.data.data);
-                        setLoading(false);
-                    }
-                })
-                .catch((error) => {
-                    console.log(error);
-                    if (axios.isAxiosError(error)) {
-                        console.log(error)
-                        setErrorMessage(!error.response.data)
-                        setErrorResult(true)
-                        setLoading(false)
-                    } else {
-                        setErrorMessage('Something went wrong!')
-                        setErrorResult(true)
-                        setLoading(false)
-                    }
-                })
-                .finally(() => {
-                    setLoading(false)
-                });
-        } else {
-            const config = {
-                method: 'get',
-                maxBodyLength: Infinity,
-                url: `${BASE_URL}/view/get-user-filtered-data-from-view`,
-                headers: {
-                    'Authorization': `Bearer ${storedSession.Authorization}`,
-                    'Content-Type': 'application/json'
-                },
-                params: {
-                    view_name: 'tickets_full_view',
-                    columns: `${type.toUpperCase()}_PassFail`,
-                    values: 'Fail',
-                    expression: '='
-                }
-            };
-
-            axios.request(config)
-                .then((response) => {
-                    console.log(JSON.stringify(response.data));
-                    if (notification) {
-                        setTickets(response.data.data);
-                        setLoading(false);
-                    } else {
-                        setTickets(response.data.data);
-                        setLoading(false);
-                    }
-                })
-                .catch((error) => {
-                    console.log(error);
-                    if (axios.isAxiosError(error)) {
-                        console.log(error);
-                        setErrorMessage(!error.response.data);
-                        setErrorResult(true);
-                        setLoading(false);
-                    } else {
-                        setErrorMessage('Something went wrong!');
-                        setErrorResult(true);
-                        setLoading(false);
-                    }
-                })
-                .finally(() => {
+            try {
+                const response = await axios.get(`${BASE_URL}/view/get-user-filtered-data-from-view`,
+                    {
+                        params: {
+                            view_name: 'tickets_full_view',
+                            columns: `MTTR_PassFail,PTL_PASSFAIL`,
+                            values: 'Fail,Fail',
+                            expression: '=,=',
+                            condition: 'OR'
+                        },
+                        headers: {
+                            'Authorization': `Bearer ${storedSession.Authorization}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                setTickets(response.data.data);
+                setLoading(false);
+            } catch (error) {
+                if (error.response.status == 403) {
+                    setErrorMessage("Not Authorized");
+                    setErrorResult(true);
                     setLoading(false);
-                });
+                }
+                else if (error.response.status == 401) {
+                    navigate("/");
+                } else {
+                    setErrorMessage(error.response.data.message);
+                    setErrorResult(true);
+                    setLoading(false);
+                }
+            }
+        } else {
+            try {
+                const response = await axios.get(`${BASE_URL}/view/get-user-filtered-data-from-view`,
+                    {
+                        params: {
+                            view_name: 'tickets_full_view',
+                            columns: `${type.toUpperCase()}_PassFail`,
+                            values: 'Fail',
+                            expression: '='
+                        },
+                        headers: {
+                            'Authorization': `Bearer ${storedSession.Authorization}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                setTickets(response.data.data);
+                setLoading(false);
+            } catch (error) {
+                if (error.response.status == 403) {
+                    setErrorMessage("Not Authorized");
+                    setErrorResult(true);
+                    setLoading(false);
+                }
+                else if (error.response.status == 401) {
+                    navigate("/");
+                } else {
+                    setErrorMessage(error.response.data.message);
+                    setErrorResult(true);
+                    setLoading(false);
+                }
+            }
         }
     }
 

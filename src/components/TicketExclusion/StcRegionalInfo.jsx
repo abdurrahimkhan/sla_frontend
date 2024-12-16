@@ -10,11 +10,12 @@ export default function StcRegionalInfo(
         remarks
     }
 ) {
+    console.log(accepted);
     return (
         <div className='flex flex-col gap-y-5 '>
             <FlexDiv justify='space-between' classes='border-b border-stc-black'>
                 <span className='font-medium'>Accepted</span>
-                <span>{accepted}</span>
+                <span>{accepted ? 'Yes': 'No'}</span>
             </FlexDiv>
 
             <FlexDiv justify='space-between' classes='border-b border-stc-black'>

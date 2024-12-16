@@ -10,7 +10,7 @@ import { BASE_URL, CONTRACTOR } from '../../constants/constants'
 import { useNavigate } from 'react-router-dom';
 import { Multiselect } from "multiselect-react-dropdown";
 import SuccessModal from '../Common/SuccessModal'
-
+import Cookie from "js-cookie";
 
 
 
@@ -34,53 +34,55 @@ export default function UserProfile() {
     const [success, setSuccess] = React.useState(false);
     const [loading, setLoading] = React.useState(false);
     const [errorResult, setErrorResult] = React.useState(false);
-    const storedSession = JSON.parse(localStorage.getItem('session'));
+    const session = Cookie.get("session");
+    const storedSession = JSON.parse(session);
     const [parentUser, setParentUser] = React.useState(storedSession.user.email);
     const navigate = useNavigate();
 
 
 
     const fetchPermissions = async () => {
-        if (storedSession) {
-            let config = {
-                method: 'get',
-                maxBodyLength: Infinity,
-                url: `${BASE_URL}/user-permissions/get-permissions-by-user-id?userID=${storedSession.user.id}`,
-                headers: {
-                    'Authorization': `Bearer ${storedSession.Authorization}`,
-                }
-            };
-            axios.request(config)
-                .then((response) => {
-                    console.log(JSON.stringify(response.data));
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/user-permissions/get-permissions-by-user-id?userID=${storedSession.user.id}`,
+            headers: {
+                'Authorization': `Bearer ${storedSession.Authorization}`,
+            }
+        };
+        axios.request(config)
+            .then((response) => {
+                console.log(JSON.stringify(response.data));
 
-                    const domainPermissions = response.data
-                        .filter((perm) => perm.permission.level === 'Domain')
-                        .map((perm) => ({
-                            id: perm.permission.id,
-                            displayName: `${perm.permission.name} (${perm.permission.level})`,
-                        }));
+                const domainPermissions = response.data
+                    .filter((perm) => perm.permission.level === 'Domain')
+                    .map((perm) => ({
+                        id: perm.permission.id,
+                        displayName: `${perm.permission.name} (${perm.permission.level})`,
+                    }));
 
-                    const districtPermissions = response.data
-                        .filter((perm) => perm.permission.level === 'District')
-                        .map((perm) => ({
-                            id: perm.permission.id,
-                            displayName: `${perm.permission.name} (${perm.permission.level})`,
-                        }));
+                const districtPermissions = response.data
+                    .filter((perm) => perm.permission.level === 'District')
+                    .map((perm) => ({
+                        id: perm.permission.id,
+                        displayName: `${perm.permission.name} (${perm.permission.level})`,
+                    }));
 
-                    setSelectedDomainIds(domainPermissions);
-                    setSelectedDistrictIds(districtPermissions);
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
-        } else {
-            navigate('/')
-        }
+                setSelectedDomainIds(domainPermissions);
+                setSelectedDistrictIds(districtPermissions);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
     }
 
     useEffect(() => {
-        fetchPermissions()
+        if (storedSession) {
+            fetchPermissions();
+        } else {
+            navigate('/');
+        }
+
     }, [])
 
 
@@ -130,7 +132,7 @@ export default function UserProfile() {
 
                             <InputContainer label='Parent User' >
                                 <input
-                                    type='text' disabled defaultValue={'hard coded'} className='w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3 pl-4' />
+                                    type='text' disabled defaultValue={storedSession.user.parent_user} className='w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3 pl-4' />
                             </InputContainer>
 
                         </FlexDiv>

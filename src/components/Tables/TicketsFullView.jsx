@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import Loader from '../Common/Loader';
 import ErrorModal from '../Common/ErrorModal';
 import ErrorResult from '../Common/ErrorResult';
-
+import Cookie from "js-cookie";
 
 
 export default function TicketsFullView({ setOpen, sidebarOpen, setSidebarOpen }) {
@@ -20,48 +20,88 @@ export default function TicketsFullView({ setOpen, sidebarOpen, setSidebarOpen }
   const [errorResult, setErrorResult] = useState(false);
   const [status, setStatus] = useState(0);
   const [errorMessage, setErrorMessage] = useState('')
-  const storedSession = JSON.parse(localStorage.getItem('session'));
-  const navigate = useNavigate();
+  const session = Cookie.get("session");
+  const storedSession = JSON.parse(session); const navigate = useNavigate();
 
   const getAllTickets = async () => {
-    let config = {
-      method: 'get',
-      maxBodyLength: Infinity,
-      url: `${BASE_URL}/ticket/tickets-by-status?status=Closed`,
-      headers: {
-        'Authorization': `Bearer ${storedSession.Authorization}`,
-      }
-    };
-    axios.request(config)
-      .then((response) => {
-        console.log(JSON.stringify(response.data));
-        const data = response.data.data;
-        if (response.data.count > 0) {
-          const columns = Object.keys(data[0]).map(key => ({
-            field: key,
-            headerName: key.charAt(0).toUpperCase() + key.slice(1), // Capitalize headers
-            filter: 'agSetColumnFilter'
-          }));
-          setColumnDefs(columns);
-        }
-        setRowData(data);
-        setTotalCount(response.data.count);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.log(error);
-        if (axios.isAxiosError(error)) {
-          
-          console.log(error)
-          setErrorMessage(error.response.data.message)
-          setErrorResult(true)
-          setLoading(false)
-        } else {
-          setErrorMessage('Something went wrong!')
-          setErrorResult(true)
-          setLoading(false)
+
+    try {
+      const response = await axios.get(`${BASE_URL}/ticket/tickets-by-status?status=Closed`, {
+        headers: {
+          Authorization: `Bearer ${storedSession.Authorization}`
         }
       });
+      const data = response.data.data;
+      if (response.data.count > 0) {
+        const columns = Object.keys(data[0]).map(key => ({
+          field: key,
+          headerName: key.charAt(0).toUpperCase() + key.slice(1), // Capitalize headers
+          filter: 'agSetColumnFilter'
+        }));
+        setColumnDefs(columns);
+      }
+      setRowData(data);
+      setTotalCount(response.data.count);
+      setLoading(false);
+
+    } catch (error) {
+      console.log(error);
+      if (error.response.data.statusCode == 403) {
+        console.log("first");
+        setErrorMessage(error.response.data.message);
+        setErrorResult(true);
+        setLoading(false);
+      }
+      else if (error.response.data.statusCode == 401) {
+        console.log("second");
+        navigate("/");
+      } else {
+        console.log("third");
+        setErrorMessage(error.response.data.message);
+        setErrorResult(true);
+        setLoading(false);
+      }
+    }
+
+
+    // let config = {
+    //   method: 'get',
+    //   maxBodyLength: Infinity,
+    //   url: `${BASE_URL}/ticket/tickets-by-status?status=Closed`,
+    //   headers: {
+    //     'Authorization': `Bearer ${storedSession.Authorization}`,
+    //   }
+    // };
+    // axios.request(config)
+    //   .then((response) => {
+    //     console.log(JSON.stringify(response.data));
+    //     const data = response.data.data;
+    //     if (response.data.count > 0) {
+    //       const columns = Object.keys(data[0]).map(key => ({
+    //         field: key,
+    //         headerName: key.charAt(0).toUpperCase() + key.slice(1), // Capitalize headers
+    //         filter: 'agSetColumnFilter'
+    //       }));
+    //       setColumnDefs(columns);
+    //     }
+    //     setRowData(data);
+    //     setTotalCount(response.data.count);
+    //     setLoading(false);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //     if (axios.isAxiosError(error)) {
+
+    //       console.log(error)
+    //       setErrorMessage(error.response.data.message)
+    //       setErrorResult(true)
+    //       setLoading(false)
+    //     } else {
+    //       setErrorMessage('Something went wrong!')
+    //       setErrorResult(true)
+    //       setLoading(false)
+    //     }
+    //   });
   }
 
 

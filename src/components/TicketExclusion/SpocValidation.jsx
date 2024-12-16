@@ -6,7 +6,8 @@ import ErrorModal from '../Common/ErrorModal';
 import SuccessModal from '../Common/SuccessModal';
 import useAuth from '../../auth/useAuth';
 import { BASE_URL } from '../../constants/constants';
-
+import { useNavigate } from 'react-router-dom';
+import Cookie from "js-cookie";
 
 
 export default function SpocValidationForm({ ticket_number, Exclusion_Reason, Huawei_Remarks, requested_hours }) {
@@ -18,11 +19,14 @@ export default function SpocValidationForm({ ticket_number, Exclusion_Reason, Hu
   // const { session } = useAuth();
   const [exclusionReasons, setExclusionReasons] = useState([]);
   const [selectedExclusionReason, setSelectedExclusionReason] = useState(Exclusion_Reason);
-  const storedSession = JSON.parse(localStorage.getItem('session'));
-  const { session, signOut } = useAuth();
+  const session = Cookie.get("session");
+  const storedSession = JSON.parse(session);
   console.log(selectedExclusionReason);
   console.log(Exclusion_Reason);
-  
+  const [errorResult, setErrorResult] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
 
 
 
@@ -30,31 +34,39 @@ export default function SpocValidationForm({ ticket_number, Exclusion_Reason, Hu
     if (storedSession) {
 
       if (exclusionTime > 0 && remarks !== '') {
-
-        let config = {
-          method: 'put',
-          maxBodyLength: Infinity,
-          url: `${BASE_URL}/ticket/ticket-spoc-validation-submit`,
-          headers: {
-            'Authorization': `Bearer ${storedSession.Authorization}`,
-            'Content-Type': 'application/json'
-          },
-          data: {
-            ticketId: ticket_number,
-            exclusionReason: selectedExclusionReason,
-            exclusionTime: exclusionTime,
-            huaweiRemarks: remarks,
-            user: storedSession.user.email,
+        try {
+          const response = await axios.put(`${BASE_URL}/ticket/ticket-spoc-validation-submit`,
+            {
+              ticketId: ticket_number,
+              exclusionReason: selectedExclusionReason,
+              exclusionTime: exclusionTime,
+              huaweiRemarks: remarks,
+              user: storedSession.user.email
+            },
+            {
+              headers: {
+                'Authorization': `Bearer ${storedSession.Authorization}`,
+                'Content-Type': 'application/json'
+              }
+            });
+          console.log(response);
+          setStatus(200);
+        } catch (error) {
+          if (error.response.status == 403) {
+            setErrorMessage("Not Authorized");
+            setErrorResult(true);
+            setLoading(false);
           }
-        };
-        axios.request(config)
-          .then((response) => {
-            console.log(JSON.stringify(response.data));
-            setStatus(200);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+          else if (error.response.status == 401) {
+            navigate("/");
+          } else {
+            setErrorMessage(error.response.data.message);
+            setErrorResult(true);
+            setLoading(false);
+          }
+        }
+
+
       } else {
         setErrorMessage('Please add remarks and exclusion time.')
         setStatus(500)
@@ -99,15 +111,15 @@ export default function SpocValidationForm({ ticket_number, Exclusion_Reason, Hu
   const closeTicket = async () => {
     const res = await axios.put(`${BASE_URL}/ticket/close-ticket`,
       {
+        ticketId: ticket_number,
+        spm: selectedExclusionReason.includes('Spare Parts') ? true : false,
+        user: storedSession.user.email,
+      },
+      {
         headers: {
           Authorization: `Bearer ${storedSession.Authorization}`,
           'Content-Type': 'application/json'
-        },
-        data: {
-          ticketId: ticket_number,
-          spm: selectedExclusionReason.includes('Spare Parts') ? true : false,
-          user: storedSession.user.email,
-        },
+        }
       }
     );
 
@@ -119,15 +131,15 @@ export default function SpocValidationForm({ ticket_number, Exclusion_Reason, Hu
       // return to spm guy
       const res = await axios.put(`${BASE_URL}/ticket/ticket-spm-validation-return`,
         {
+          ticketId: ticket_number,
+          spm: selectedExclusionReason.includes('Spare Parts') ? true : false,
+          user: storedSession.user.email,
+        },
+        {
           headers: {
             Authorization: `Bearer ${storedSession.Authorization}`,
             'Content-Type': 'application/json'
-          },
-          data: {
-            ticketId: ticket_number,
-            spm: selectedExclusionReason.includes('Spare Parts') ? true : false,
-            user: storedSession.user.email,
-          },
+          }
         }
       );
 
@@ -165,6 +177,8 @@ export default function SpocValidationForm({ ticket_number, Exclusion_Reason, Hu
       };
 
       fetchData();
+    } else{
+      navigate('/');
     }
   }, [])
 

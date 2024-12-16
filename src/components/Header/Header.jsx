@@ -9,6 +9,7 @@ import { Dropdown } from 'antd';
 import { CONTRACTOR } from '../../constants/constants';
 import useAuth from '../../auth/useAuth';
 import { TicketCountContext } from '../../context/TicketNotifications/GlobalProvider';
+import Cookie from "js-cookie";
 
 
 
@@ -17,7 +18,8 @@ export default function Header({ setOpen, sidebarOpen, setSidebarOpen }) {
   const [username, setUsername] = useState('')
   const [logoutVisible, setLogoutVisible] = useState(false);
   const { signOut } = useAuth();
-  const storedSession = JSON.parse(localStorage.getItem('session'));
+  const session = Cookie.get("session");
+  const storedSession = JSON.parse(session);
   const { mttrCount, ptlCount } = useContext(TicketCountContext);
   const [items, setItems] = useState([]);
 
@@ -30,7 +32,7 @@ export default function Header({ setOpen, sidebarOpen, setSidebarOpen }) {
       tempItems.push({
         key: '1',
         label: (
-          <span onClick={() => { window.location.href = '/pending-tickets/MTTR'; }} className='text-stc-red hover:text-white py-1 w-full px-3 hover:bg-stc-red'>
+          <span onClick={() => { window.location.href = '/sla/pending-tickets/MTTR'; }} className='text-stc-red hover:text-white py-1 w-full px-3 hover:bg-stc-red'>
             {mttrCount} MTTR Requests ({CONTRACTOR})
           </span>
         )
@@ -41,7 +43,7 @@ export default function Header({ setOpen, sidebarOpen, setSidebarOpen }) {
       tempItems.push({
         key: '2',
         label: (
-          <span onClick={() => { window.location.href = '/pending-tickets/PTL'; }} className='text-stc-red hover:text-white py-1 w-full px-3 hover:bg-stc-red'>
+          <span onClick={() => { window.location.href = '/sla/pending-tickets/PTL'; }} className='text-stc-red hover:text-white py-1 w-full px-3 hover:bg-stc-red'>
             {ptlCount} PTL Requests ({CONTRACTOR})
           </span>
         )
@@ -71,7 +73,7 @@ export default function Header({ setOpen, sidebarOpen, setSidebarOpen }) {
   return (
     <FlexDiv justify='space-between' classes='w-full h-16 px-1 bg-stc-purple'>
       <FlexDiv justify='start' gapX={24} classes='w-1/2'>
-        <img src='/images/logo.png' width={120} height={100} alt='logo' />
+        <img src='/sla/images/logo.png' width={120} height={100} alt='logo' />
         <FaBars onClick={() => setSidebarOpen(!sidebarOpen)} className='text-white text-2xl ml-2 cursor-pointer' />
       </FlexDiv>
 

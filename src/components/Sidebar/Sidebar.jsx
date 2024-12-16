@@ -40,7 +40,7 @@ const navItems = [
     // },
     {
         icon: <FaTable className="text-white text-2xl font-thin" />,
-        text: 'AllTickets',
+        text: 'All Closed Tickets',
         link: '/all-tickets'
     }
 ]

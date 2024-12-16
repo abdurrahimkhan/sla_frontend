@@ -5,7 +5,7 @@ import WebRouter from './routes/index'
 function App() {
   return (
     <div className='app'>
-      <Router>
+      <Router basename='/sla'>
         <WebRouter />
       </Router>
     </div>

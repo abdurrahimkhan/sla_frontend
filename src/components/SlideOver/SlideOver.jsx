@@ -79,7 +79,8 @@ export default function SlideOver({ open, setOpen, links }) {
                           className="bg-purple font-medium text-white px-3 py-2 rounded-md"
                           onClick={(event) => {
                             event.preventDefault();  // Prevent default behavior
-                            window.open(`http://localhost:3000/worklog/${window.location.pathname.split('/')[2]}`, '_blank'); // Open in new tab
+                            // window.open(`https://10.23.65.30/sla/worklog/${window.location.pathname.split('/')[3]}`, '_blank'); // Open in new tab
+                            window.open(`http://localhost:3002/sla/worklog/${window.location.pathname.split('/')[3]}`, '_blank'); // Open in new tab
                           }}
                         >
                           SLA Worklog

@@ -6,7 +6,8 @@ import { Button, ConfigProvider, Input, Space, Table } from 'antd';
 import Highlighter from 'react-highlight-words';
 import axios from 'axios';
 import { BASE_URL } from '../../../constants/constants';
-
+import Cookie from "js-cookie";
+import { useNavigate } from 'react-router-dom';
 
 
 const TicketView = ({ data }) => {
@@ -14,24 +15,31 @@ const TicketView = ({ data }) => {
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
     const [data1, setData] = useState();
-    const storedSession = JSON.parse(localStorage.getItem('session'));
+    const session = Cookie.get("session");
+    const storedSession = JSON.parse(session);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        console.log(data[0]['value']);
-        const getTicketDetails = async () => {
-            const res = await axios.get(
-                `${BASE_URL}/view/get-user-filtered-data-from-view`,
-                {
-                    headers: {
-                        'Authorization': 'Bearer ' + storedSession.Authorization,
-                        'Content-Type': 'application/json'
+        if(storedSession){
+            console.log(data[0]['value']);
+            const getTicketDetails = async () => {
+                const res = await axios.get(
+                    `${BASE_URL}/view/get-user-filtered-data-from-view`,
+                    {
+                        headers: {
+                            'Authorization': 'Bearer ' + storedSession.Authorization,
+                            'Content-Type': 'application/json'
+                        }
                     }
-                }
-            );
-            console.log(res);
+                );
+                console.log(res);
+            }
+    
+            getTicketDetails();
+        } else {
+            navigate('/');
         }
-
-        getTicketDetails();
+        
 
     }, []);
 

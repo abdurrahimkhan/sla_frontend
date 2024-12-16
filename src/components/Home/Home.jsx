@@ -48,7 +48,7 @@ const panels = [
   }
   ,
   {
-    name: 'ViewData',
+    name: 'All Closed Tickets',
     link: '/all-tickets',
     icon: <FaTable className="text-4xl font-medium" />,
   }

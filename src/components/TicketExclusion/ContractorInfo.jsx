@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import FlexDiv from '../Common/FlexDiv'
 // import { useSession } from 'next-auth/react';
-import axios from 'axios';
 import SuccessModal from '../Common/SuccessModal';
 import ErrorModal from '../Common/ErrorModal';
 import useAuth from '../../auth/useAuth';

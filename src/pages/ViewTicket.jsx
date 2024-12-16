@@ -16,7 +16,7 @@ import { CONTRACTOR, BASE_URL } from '../constants/constants';
 import axios from 'axios';
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-
+import Cookie from "js-cookie";
 
 
 export default function ViewTicket() {
@@ -27,12 +27,13 @@ export default function ViewTicket() {
     const [data, setData] = useState(null)
     const [ticket, setTicket] = useState(null);
     // const { data: session } = useSession();
-    const { session, signOut } = useAuth();
     const [user, setUser] = useState();
     const navigate = useNavigate();
     const { pr_id } = useParams();
     const [searchParams] = useSearchParams();
     const source = searchParams.get('source');
+    const session = Cookie.get("session");
+    const storedSession = JSON.parse(session);
 
 
 
@@ -43,105 +44,60 @@ export default function ViewTicket() {
     }, [activeTab]);
 
     useEffect(() => {
-        searchTicket(pr_id)
+        if (storedSession) {
+            searchTicket(pr_id);
+        } else {
+            navigate('/');
+        }
     }, [])
 
-    useEffect(() => {
-        if (session) {
-            setUser(session.user);
-        }
-    }, [session])
+
 
 
     const searchTicket = async (pr_id) => {
         setLoading(true);
         console.log(pr_id);
-        const storedSession = JSON.parse(localStorage.getItem('session'));
 
-        if (storedSession) {
-            try {
-                const response = await axios.get(`${BASE_URL}/view/get-filtered-data-from-view`, {
-                    params: {
-                        view_name: 'Tickets_Full_View',
-                        columns: 'PR_ID',
-                        values: pr_id,
-                        expression: '='
-                    },
-                    headers: {
-                        Authorization: `Bearer ${storedSession.Authorization}`,
-                        'Content-Type': 'application/json'
-                    }
+        try {
+            const response = await axios.get(`${BASE_URL}/view/get-filtered-data-from-view`, {
+                params: {
+                    view_name: 'Tickets_Full_View',
+                    columns: 'PR_ID',
+                    values: pr_id,
+                    expression: '='
+                },
+                headers: {
+                    Authorization: `Bearer ${storedSession.Authorization}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            console.log(response);
+            console.log(response.data.data[0]);
+            const tempData = []
+            Object.entries(response.data.data[0]).forEach(([key, value]) => {
+                console.log(key, value);
+                // key = key.replaceAll('Contractor', CONTRACTOR);
+                tempData.push({
+                    description: key.replaceAll('_', ' '),
+                    value: value
                 });
-                console.log(response);
-                console.log(response.data.data[0]);
-                const tempData = []
-                Object.entries(response.data.data[0]).forEach(([key, value]) => {
-                    console.log(key, value);
-                    // key = key.replaceAll('Contractor', CONTRACTOR);
-                    tempData.push({
-                        description: key.replaceAll('_', ' '),
-                        value: value
-                    });
-                });
-                setData(tempData);
-                setTicket(response.data.data[0]);
+            });
+            setData(tempData);
+            setTicket(response.data.data[0]);
+            setLoading(false);
+        } catch (error) {
+            if (error.response.status == 403) {
+                setErrorMessage("Not Authorized");
+                setErrorResult(true);
                 setLoading(false);
-            } catch (error) {
-                console.log(error);
-                // if (error.response.status == 403) {
-                //     alert("Session expired, Kindly Login Again.");
-                //     signOut();
-                // }
-                // setErrorMessage(error.response.data)
-                setErrorResult(true)
-                setLoading(false)
             }
-
-            // let config = {
-            //     method: 'post',
-            //     maxBodyLength: Infinity,
-            //     url: `${BASE_URL}/ticket/fetch-tickets`,
-            //     headers: {
-            //         'Authorization': `Bearer ${storedSession.Authorization}`,
-            //         'Content-Type': 'application/json'
-            //     },
-            //     data: JSON.stringify({
-            //         prIDs: pr_id
-            //     })
-            // };
-
-            // axios.request(config)
-            //     .then((response) => {
-            //         console.log(JSON.stringify(response.data));
-            //         console.log("tickepage");
-            //         setTicket(response.data.data[0]);
-            //         const tempData = []
-
-            //         Object.entries(response.data.data[0]).forEach(([key, value]) => {
-            //             console.log(key, value);
-            //             // key = key.replaceAll('Contractor', CONTRACTOR);
-            //             tempData.push({
-            //                 description: key.replaceAll('_', ' '),
-            //                 value: value
-            //             });
-            //         });
-            //         setData(tempData);
-            //         setLoading(false);
-            //     })
-            //     .catch((error) => {
-            //         console.log(error);
-            //         if (error.response.status == 403) {
-            //             alert("Session expired, Kindly Login Again.");
-            //             signOut();
-            //         }
-            //         setErrorMessage(error.response.data)
-            //         setErrorResult(true)
-            //         setLoading(false)
-            //     });
-
-        } else {
-            alert("No Session, Kindly Login.");
-            navigate(`/`);
+            else if (error.response.status == 401) {
+                navigate("/");
+            } else {
+                setErrorMessage(error.response.data.message);
+                setErrorResult(true);
+                setLoading(false);
+            }
         }
     }
 
@@ -170,12 +126,12 @@ export default function ViewTicket() {
                             <CollapseComponent headerText='STC Governance Acceptance Details'>
 
                                 {!ticket?.STC_NOC_Handler ?
-                                        'Request is not handled by STC Governance yet' :
-                                        <StcNocInfo
-                                            accepted={ticket?.Exclude_STC}
-                                            approved_excluded_time={ticket?.Exclusion_Time_Agreed}
-                                            approved_rejected_by={ticket?.STC_NOC_Handler}
-                                            remarks={ticket?.STC_Remarks_Gov} />
+                                    'Request is not handled by STC Governance yet' :
+                                    <StcNocInfo
+                                        accepted={ticket?.Exclude_STC}
+                                        approved_excluded_time={ticket?.Exclusion_Time_Agreed}
+                                        approved_rejected_by={ticket?.STC_NOC_Handler}
+                                        remarks={ticket?.STC_Remarks_Gov} />
                                 }
 
                             </CollapseComponent>
@@ -184,14 +140,14 @@ export default function ViewTicket() {
                             <CollapseComponent headerText='STC Regional Acceptance Details'>
                                 {
                                     !ticket?.STC_Region_Handler ?
-                                            'Request was not handled by STC Regional' :
-                                            <StcRegionalInfo
-                                                accepted={ticket?.STC_Regional_Final_Acceptance}
-                                                initial_rejection={ticket?.Regional_Initial_Rejection ? 'Yes' : 'No'}
-                                                approved_excluded_time={ticket?.STC_Regional_Accepted_Time}
-                                                approved_rejected_by={ticket?.STC_Region_Handler}
-                                                remarks={ticket?.STC_Remarks}
-                                            />
+                                        'Request was not handled by STC Regional' :
+                                        <StcRegionalInfo
+                                            accepted={ticket?.STC_Regional_Final_Acceptance}
+                                            initial_rejection={ticket?.Regional_Initial_Rejection ? 'Yes' : 'No'}
+                                            approved_excluded_time={ticket?.STC_Regional_Accepted_Time}
+                                            approved_rejected_by={ticket?.STC_Region_Handler}
+                                            remarks={ticket?.STC_Remarks}
+                                        />
                                 }
                             </CollapseComponent>
 

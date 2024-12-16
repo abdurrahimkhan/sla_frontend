@@ -8,7 +8,7 @@ import SuccessModal from '../Common/SuccessModal';
 import useAuth from '../../auth/useAuth';
 import { BASE_URL } from '../../constants/constants';
 import ErrorResult from '../Common/ErrorResult';
-
+import Cookie from "js-cookie";
 
 export default function SpmValidation({ ticket_number, Exclusion_Reason, requested_hours, Huawei_Remarks }) {
   const [exclusionTime, setExclusionTime] = useState(parseFloat(requested_hours));
@@ -20,45 +20,85 @@ export default function SpmValidation({ ticket_number, Exclusion_Reason, request
   const [errorResult, setErrorResult] = useState(false);
   const [exclusionReasons, setExclusionReasons] = useState([]);
   const [selectedExclusionReason, setSelectedExclusionReason] = useState(Exclusion_Reason);
-  const storedSession = JSON.parse(localStorage.getItem('session'));
+  const session = Cookie.get("session");
+  const storedSession = JSON.parse(session);
   const navigate = useNavigate();
 
 
   const submitTicket = async () => {
     if (storedSession) {
       if (exclusionTime > 0 && remarks !== '') {
-        let config = {
-          method: 'put',
-          maxBodyLength: Infinity,
-          url: `${BASE_URL}/ticket/ticket-spare-parts-validation-submit`,
-          headers: {
-            'Authorization': `Bearer ${storedSession.Authorization}`,
-            'Content-Type': 'application/json'
-          },
-          data: JSON.stringify({
-            ticketId: ticket_number,
-            exclusionReason: selectedExclusionReason,
-            exclusionTime: exclusionTime,
-            huaweiRemarks: remarks,
-            user: storedSession.user.email,
-          })
-        };
+        console.log(JSON.stringify({
+          ticketId: ticket_number,
+          exclusionReason: selectedExclusionReason,
+          exclusionTime: exclusionTime,
+          huaweiRemarks: remarks,
+          user: storedSession.user.email,
+        }))
+        try {
+          const response = await axios.put(`${BASE_URL}/ticket/ticket-spare-parts-validation-submit`,
+            {
+              ticketId: ticket_number,
+              exclusionReason: selectedExclusionReason,
+              exclusionTime: exclusionTime,
+              huaweiRemarks: remarks,
+              user: storedSession.user.email
+            },
+            {
+              headers: {
+                'Authorization': `Bearer ${storedSession.Authorization}`,
+                'Content-Type': 'application/json'
+              }
+            });
+          console.log(response);
+          setStatus(200);
+        } catch (error) {
+          if (error.response.status == 403) {
+            setErrorMessage("Not Authorized");
+            setErrorResult(true);
+            setLoading(false);
+          }
+          else if (error.response.status == 401) {
+            navigate("/");
+          } else {
+            setErrorMessage(error.response.data.message);
+            setErrorResult(true);
+            setLoading(false);
+          }
+        }
 
-        axios.request(config)
-          .then((response) => {
-            console.log(response);
-            setStatus(200);
-          })
-          .catch((error) => {
-            console.log(error);
-            if (error.response.status == 403) {
-              alert("Session expired, Kindly Login Again.");
-              signOut();
-            }
-            setErrorMessage(error.response.data)
-            setErrorResult(true)
-            setLoading(false)
-          });
+        // let config = {
+        //   method: 'put',
+        //   maxBodyLength: Infinity,
+        //   url: `${BASE_URL}/ticket/ticket-spare-parts-validation-submit`,
+        //   headers: {
+        //     'Authorization': `Bearer ${storedSession.Authorization}`,
+        //     'Content-Type': 'application/json'
+        //   },
+        //   data: JSON.stringify({
+        //     ticketId: ticket_number,
+        //     exclusionReason: selectedExclusionReason,
+        //     exclusionTime: exclusionTime,
+        //     huaweiRemarks: remarks,
+        //     user: storedSession.user.email,
+        //   })
+        // };
+
+        // axios.request(config)
+        //   .then((response) => {
+        //     console.log(response);
+        //     setStatus(200);
+        //   })
+        //   .catch((error) => {
+        //     console.log(error);
+        //     if (error.response.status == 403) {
+        //       alert("Session expired, Kindly Login Again.");
+        //       signOut();
+        //     }
+        //     setErrorMessage(error.response.data)
+        //     setErrorResult(true)
+        //     setLoading(false)
+        //   });
       } else {
         setErrorMessage('Please add remarks and exclusion time.')
         setStatus(500)
@@ -68,36 +108,65 @@ export default function SpmValidation({ ticket_number, Exclusion_Reason, request
 
   const returnTicket = async () => {
     if (storedSession) {
-      let config = {
-        method: 'put',
-        maxBodyLength: Infinity,
-        url: `${BASE_URL}/ticket/ticket-spare-parts-validation-return`,
-        headers: {
-          'Authorization': `Bearer ${storedSession.Authorization}`,
-          'Content-Type': 'application/json'
-        },
-        data: {
-          ticketId: ticket_number,
-          spm: true,
-          user: storedSession.user.email,
+      try {
+        const response = await axios.put(`${BASE_URL}/ticket/ticket-spare-parts-validation-return`,
+          {
+            ticketId: ticket_number,
+            spm: true,
+            user: storedSession.user.email
+          },
+          {
+            headers: {
+              'Authorization': `Bearer ${storedSession.Authorization}`,
+              'Content-Type': 'application/json'
+            }
+          });
+        console.log(response);
+        setStatus(200);
+      } catch (error) {
+        if (error.response.status == 403) {
+          setErrorMessage("Not Authorized");
+          setErrorResult(true);
+          setLoading(false);
         }
-      };
+        else if (error.response.status == 401) {
+          navigate("/");
+        } else {
+          setErrorMessage(error.response.data.message);
+          setErrorResult(true);
+          setLoading(false);
+        }
+      }
+      // let config = {
+      //   method: 'put',
+      //   maxBodyLength: Infinity,
+      //   url: `${BASE_URL}/ticket/ticket-spare-parts-validation-return`,
+      //   headers: {
+      //     'Authorization': `Bearer ${storedSession.Authorization}`,
+      //     'Content-Type': 'application/json'
+      //   },
+      //   data: {
+      //     ticketId: ticket_number,
+      //     spm: true,
+      //     user: storedSession.user.email,
+      //   }
+      // };
 
-      axios.request(config)
-        .then((response) => {
-          console.log(JSON.stringify(response.data));
-          setStatus(200);
-        })
-        .catch((error) => {
-          console.log(error);
-          if (error.response.status == 403) {
-            alert("Session expired, Kindly Login Again.");
-            signOut();
-          }
-          setErrorMessage(error.response.data)
-          setErrorResult(true)
-          setLoading(false)
-        });
+      // axios.request(config)
+      //   .then((response) => {
+      //     console.log(JSON.stringify(response.data));
+      //     setStatus(200);
+      //   })
+      //   .catch((error) => {
+      //     console.log(error);
+      //     if (error.response.status == 403) {
+      //       alert("Session expired, Kindly Login Again.");
+      //       signOut();
+      //     }
+      //     setErrorMessage(error.response.data)
+      //     setErrorResult(true)
+      //     setLoading(false)
+      //   });
     }
   }
 

@@ -2,6 +2,7 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../../constants/constants';
 import ticketReducer from './Reducer';
+import Cookie from "js-cookie";
 
 export const TicketCountContext = createContext();
 
@@ -15,7 +16,8 @@ export const TicketCountProvider = ({ children }) => {
         ptlCount: 0
     };
     const [state, dispatch] = useReducer(ticketReducer, initialState);
-    const storedSession = JSON.parse(localStorage.getItem('session'));
+    const session = Cookie.get("session");
+    const storedSession = JSON.parse(session);
 
     const fetchTicketStats = async () => {
         const cookieNameMttr = 'mttrCount';

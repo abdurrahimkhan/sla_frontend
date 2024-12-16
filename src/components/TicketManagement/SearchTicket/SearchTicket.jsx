@@ -3,12 +3,12 @@ import ErrorResult from '../../Common/ErrorResult';
 import FlexDiv from '../../Common/FlexDiv'
 import Loader from '../../Common/Loader';
 import axios from 'axios';
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { IoSearchSharp } from 'react-icons/io5'
 import TicketsTable from '../TicketTable/TicketTable';
 import { BASE_URL } from '../../../constants/constants';
-
-
+import Cookie from "js-cookie";
+import { useNavigate } from 'react-router-dom';
 
 export default function SearchTicket() {
     const [ticketNumber, setTicketNumber] = useState('')
@@ -17,7 +17,11 @@ export default function SearchTicket() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
     const [data, setData] = useState(null);
-    const storedSession = JSON.parse(localStorage.getItem('session'));
+    const session = Cookie.get("session");
+    const storedSession = JSON.parse(session);
+    const navigate = useNavigate();
+
+
     const searchTicket = async () => {
         if (ticketNumber === '' || !(ticketNumber.startsWith('PR')) || ticketNumber.length < 13) {
             setError(true)
@@ -41,18 +45,26 @@ export default function SearchTicket() {
             setLoading(false);
             setData(res.data.data);
         } catch (error) {
-            if (axios.isAxiosError(error)) {
-                console.log(error)
-                setErrorMessage(!error.response.data)
-                setErrorResult(true)
-                setLoading(false)
+            if (error.response.status == 403) {
+                setErrorMessage("Not Authorized");
+                setErrorResult(true);
+                setLoading(false);
+            }
+            else if (error.response.status == 401) {
+                navigate("/");
             } else {
-                setErrorMessage('Something went wrong!')
-                setErrorResult(true)
-                setLoading(false)
+                setErrorMessage(error.response.data.message);
+                setErrorResult(true);
+                setLoading(false);
             }
         }
     }
+
+    useEffect(() => {
+        if(!storedSession){
+            navigate('/');
+        }
+    }, []);
 
     if (loading) {
         return (
@@ -61,6 +73,8 @@ export default function SearchTicket() {
             </FlexDiv>
         )
     }
+
+    
 
     return (
         <FlexDiv classes='h-[80vh] bg-white p-10'>

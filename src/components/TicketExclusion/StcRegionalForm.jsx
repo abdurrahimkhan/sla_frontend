@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import FlexDiv from '../Common/FlexDiv'
 // import { useSession } from 'next-auth/react';
 import useAuth from '../../auth/useAuth'
@@ -6,6 +6,8 @@ import axios from 'axios';
 import SuccessModal from '../Common/SuccessModal';
 import ErrorModal from '../Common/ErrorModal';
 import { BASE_URL } from '../../constants/constants';
+import { useNavigate } from 'react-router-dom';
+import Cookie from "js-cookie";
 
 export default function StcRegionalForm(
   { ticket_number, initialRejection, currentState, requested_hours }
@@ -15,80 +17,90 @@ export default function StcRegionalForm(
   const [errorMessage, setErrorMessage] = useState('')
   const [remarks, setRemarks] = useState('')
   // const { data: session } = useSession();
-  const { session, signOut } = useAuth();
-  const storedSession = JSON.parse(localStorage.getItem('session'));
-
+  const session = Cookie.get("session");
+  const storedSession = JSON.parse(session);
+  const [errorResult, setErrorResult] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
 
 
 
   const acceptTicket = async () => {
-    if (storedSession) {
-      if (acceptedExculsionTime > 0 && remarks !== '') {
-
-        let config = {
-          method: 'put',
-          maxBodyLength: Infinity,
-          url: `${BASE_URL}/ticket/ticket-stc-regional-accept`,
-          headers: {
-            'Authorization': `Bearer ${storedSession.Authorization}`,
-            'Content-Type': 'application/json'
-          },
-          data: {
+    if (acceptedExculsionTime > 0 && remarks !== '') {
+      try {
+        const response = await axios.put(`${BASE_URL}/ticket/ticket-stc-regional-accept`,
+          {
             ticketId: ticket_number,
             acceptedTime: acceptedExculsionTime,
             remarks: remarks,
             user: storedSession.user.email,
-          }
-        };
-        axios.request(config)
-          .then((response) => {
-            console.log(JSON.stringify(response.data));
-            setStatus(200);
-          })
-          .catch((error) => {
-            console.log(error);
+          },
+          {
+            headers: {
+              'Authorization': `Bearer ${storedSession.Authorization}`,
+              'Content-Type': 'application/json'
+            }
           });
-
-
-      } else {
-        setErrorMessage('Please add remarks and exclusion time.')
-        setStatus(500)
+        console.log(response);
+        setStatus(200);
+      } catch (error) {
+        if (error.response.status == 403) {
+          setErrorMessage("Not Authorized");
+          setErrorResult(true);
+          setLoading(false);
+        }
+        else if (error.response.status == 401) {
+          navigate("/");
+        } else {
+          setErrorMessage(error.response.data.message);
+          setErrorResult(true);
+          setLoading(false);
+        }
       }
-    } else {
 
+    } else {
+      setErrorMessage('Please add remarks and exclusion time.')
+      setStatus(500)
     }
+
   }
 
 
   const rejectTicket = async () => {
-    if (session && session.user) {
 
-      if (remarks !== '') {
-        const res = await axios.put(
-          `${BASE_URL}/ticket/ticket-stc-regional-reject`,
-          {
-            ticketId: ticket_number,
-            remarks: remarks,
-            acceptedTime: 0,
-            user: storedSession.user.email,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${storedSession.Authorization}`,
-              'Content-Type': 'application/json'
-            }
+    if (remarks !== '') {
+      const res = await axios.put(
+        `${BASE_URL}/ticket/ticket-stc-regional-reject`,
+        {
+          ticketId: ticket_number,
+          remarks: remarks,
+          acceptedTime: 0,
+          user: storedSession.user.email,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${storedSession.Authorization}`,
+            'Content-Type': 'application/json'
           }
-        );
+        }
+      );
 
-        setStatus(200);
+      setStatus(200);
 
-      } else {
-        setErrorMessage('Please add remarks')
-        setStatus(500)
-      }
+    } else {
+      setErrorMessage('Please add remarks')
+      setStatus(500)
     }
+
   }
+
+  useEffect(() => {
+    if (!storedSession) {
+      navigate('/');
+    }
+  }, []);
+
 
   return (
     <div className='flex flex-col gap-y-5 '>

@@ -8,7 +8,7 @@ import useAuth from '../../auth/useAuth';
 import { BASE_URL } from '../../constants/constants';
 import { useNavigate } from 'react-router-dom';
 import ErrorResult from '../Common/ErrorResult';
-
+import Cookie from "js-cookie";
 
 export default function HuaDepartment({ ticket_number, currentState, requested_hours }) {
   const [exclusionTime, setExclusionTime] = useState(parseFloat(requested_hours));
@@ -19,7 +19,8 @@ export default function HuaDepartment({ ticket_number, currentState, requested_h
   const { signOut } = useAuth();
   const [exclusionReasons, setExclusionReasons] = useState([]);
   const [selectedExclusionReason, setSelectedExclusionReason] = useState('');
-  const storedSession = JSON.parse(localStorage.getItem('session'));
+  const session = Cookie.get("session");
+  const storedSession = JSON.parse(session);
   const [loading, setLoading] = useState(true);
   const [errorResult, setErrorResult] = useState(false);
   const navigate = useNavigate();
@@ -28,40 +29,76 @@ export default function HuaDepartment({ ticket_number, currentState, requested_h
   const submitTicket = async () => {
     if (storedSession) {
       if (exclusionTime > 0 && remarks !== '') {
-
-        let config = {
-          method: 'put',
-          maxBodyLength: Infinity,
-          url: `${BASE_URL}/ticket/ticket-exclusion-submission`,
-          headers: {
-            'Authorization': `Bearer ${storedSession.Authorization}`,
-            'Content-Type': 'application/json'
-          },
-          data: JSON.stringify({
-            ticketId: ticket_number,
-            exclusionReason: selectedExclusionReason,
-            exclusionTime: exclusionTime,
-            huaweiRemarks: remarks,
-            user: storedSession.user.email,
-          })
-        };
-
-        axios.request(config)
-          .then((response) => {
-            console.log(response);
-
-            setStatus(200);
-          })
-          .catch((error) => {
-            console.log(error);
-            if (error.response.status == 403) {
-              alert("Session expired, Kindly Login Again.");
-              signOut();
+        try {
+          const response = await axios.put(
+            `${BASE_URL}/ticket/ticket-exclusion-submission`,
+            {
+              ticketId: ticket_number,
+              exclusionReason: selectedExclusionReason,
+              exclusionTime: exclusionTime,
+              huaweiRemarks: remarks,
+              user: storedSession.user.email
+            },
+            {
+              headers: {
+                'Authorization': `Bearer ${storedSession.Authorization}`,
+                'Content-Type': 'application/json'
+              }
             }
-            setErrorMessage(error.response.data)
-            setErrorResult(true)
-            setLoading(false)
-          });
+          );
+          console.log(response);
+          setStatus(200);
+        } catch (error) {
+          if (error.response.status == 403) {
+            setErrorMessage("Not Authorized");
+            setErrorResult(true);
+            setLoading(false);
+          }
+          else if (error.response.status == 401) {
+            navigate("/");
+          } else {
+            setErrorMessage(error.response.data.message);
+            setErrorResult(true);
+            setLoading(false);
+          }
+        }
+
+
+
+
+        // let config = {
+        //   method: 'put',
+        //   maxBodyLength: Infinity,
+        //   url: `${BASE_URL}/ticket/ticket-exclusion-submission`,
+        //   headers: {
+        //     'Authorization': `Bearer ${storedSession.Authorization}`,
+        //     'Content-Type': 'application/json'
+        //   },
+        //   data: JSON.stringify({
+        //     ticketId: ticket_number,
+        //     exclusionReason: selectedExclusionReason,
+        //     exclusionTime: exclusionTime,
+        //     huaweiRemarks: remarks,
+        //     user: storedSession.user.email,
+        //   })
+        // };
+
+        // axios.request(config)
+        //   .then((response) => {
+        //     console.log(response);
+
+        //     setStatus(200);
+        //   })
+        //   .catch((error) => {
+        //     console.log(error);
+        //     if (error.response.status == 403) {
+        //       alert("Session expired, Kindly Login Again.");
+        //       signOut();
+        //     }
+        //     setErrorMessage(error.response.data)
+        //     setErrorResult(true)
+        //     setLoading(false)
+        //   });
 
       } else {
         setErrorMessage('Please add remarks and exclusion time.')

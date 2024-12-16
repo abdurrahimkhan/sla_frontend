@@ -9,7 +9,8 @@ import { BASE_URL } from '../../../constants/constants';
 import SuccessModal from '../../Common/SuccessModal';
 import ErrorModal from '../../Common/ErrorModal';
 // import { SelectInfo } from 'antd/es/calendar/generateCalendar';
-
+import Cookie from "js-cookie";
+import { useNavigate } from 'react-router-dom';
 
 const CalendarComponent = () => {
   const { token } = theme.useToken();
@@ -17,15 +18,19 @@ const CalendarComponent = () => {
   const [startDate, setStartDate] = React.useState(null);
   const [endDate, setEndDate] = React.useState(null);
   const [status, setStatus] = React.useState(0);
-  const storedSession = JSON.parse(localStorage.getItem('session'));
+  const session = Cookie.get("session");
+    const storedSession = JSON.parse(session);
   const [errorMessage, setErrorMessage] = React.useState('');
   const [slaDetails, setSlaDetails] = React.useState('');
   // const [errorResult, setErrorResult] = React.useState(false);
-
+  const navigate = useNavigate();
 
 
 
   React.useEffect(() => {
+    if(!storedSession){
+      navigate('/');
+    }
     setTimeout(() => {
       setLoading(false);
     }, 500);
@@ -72,41 +77,6 @@ const CalendarComponent = () => {
       setLoading(false)
 
     }
-
-
-    // let config = {
-    //   method: 'get',
-    //   maxBodyLength: Infinity,
-    //   url: `${BASE_URL}/ticket/fetch-ticket-stats-by-date?date=${value.format('YYYY-MM-DD')}`,
-    //   headers: {
-    //     'Authorization': `Bearer ${storedSession.Authorization}`,
-    //     'Content-Type': 'application/json'
-    //   },
-    // };
-
-    // axios.request(config)
-    //   .then((response) => {
-    //     setSlaDetails(response.data.count);
-    //     setStatus(200);
-
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //     if (axios.isAxiosError(error)) {
-    //       console.log(error)
-    //       setErrorMessage(!error.response.data)
-    //       // setErrorResult(true)
-    //       setStatus(500)
-    //       setLoading(false)
-    //     } else {
-    //       setErrorMessage('Something went wrong!')
-    //       // setErrorResult(true)
-    //       setStatus(500)
-    //       setLoading(false)
-    //     }
-    //   });
-
-
   };
 
   const wrapperStyle = {

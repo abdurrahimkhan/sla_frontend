@@ -6,8 +6,8 @@ import ErrorModal from '../Common/ErrorModal';
 import SuccessModal from '../Common/SuccessModal';
 import useAuth from '../../auth/useAuth';
 import { BASE_URL } from '../../constants/constants';
-
-
+import Cookie from "js-cookie";
+import { useNavigate } from 'react-router-dom';
 
 export default function SpocFinalForm({ ticket_number, Exclusion_Reason, Huawei_Remarks, requested_hours }) {
   const [exclusionTime, setExclusionTime] = useState(parseFloat(requested_hours));
@@ -18,10 +18,11 @@ export default function SpocFinalForm({ ticket_number, Exclusion_Reason, Huawei_
   // const { session } = useAuth();
   const [exclusionReasons, setExclusionReasons] = useState([]);
   const [selectedExclusionReason, setSelectedExclusionReason] = useState(Exclusion_Reason);
-  const storedSession = JSON.parse(localStorage.getItem('session'));
-  const { session, signOut } = useAuth();
+  const session = Cookie.get("session");
+  const storedSession = JSON.parse(session);
   console.log(selectedExclusionReason);
   console.log(Exclusion_Reason);
+  const navigate = useNavigate();
 
 
   const closeTicket = async () => {
@@ -76,8 +77,8 @@ export default function SpocFinalForm({ ticket_number, Exclusion_Reason, Huawei_
 
   useEffect(() => {
 
-    if (storedSession) {
-
+    if (!storedSession) {
+      navigate('/');
     }
   }, [])
 

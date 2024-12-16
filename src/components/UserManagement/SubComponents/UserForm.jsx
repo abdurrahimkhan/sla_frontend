@@ -10,7 +10,7 @@ import { BASE_URL, CONTRACTOR } from '../../../constants/constants'
 import { useNavigate } from 'react-router-dom';
 import { Multiselect } from "multiselect-react-dropdown";
 import SuccessModal from '../../Common/SuccessModal'
-
+import Cookie from "js-cookie";
 
 
 
@@ -34,7 +34,8 @@ export default function UserForm() {
   const [success, setSuccess] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [errorResult, setErrorResult] = React.useState(false);
-  const storedSession = JSON.parse(localStorage.getItem('session'));
+  const session = Cookie.get("session");
+    const storedSession = JSON.parse(session);
   // const [parentUser, setParentUser] = React.useState(storedSession.user.email);
   const navigate = useNavigate();
 
@@ -75,7 +76,12 @@ export default function UserForm() {
   }
 
   useEffect(() => {
-    fetchPermissions()
+    if(storedSession) {
+      fetchPermissions();
+    } else {
+      navigate('/');
+    }
+    
   }, [])
 
   useEffect(() => {
