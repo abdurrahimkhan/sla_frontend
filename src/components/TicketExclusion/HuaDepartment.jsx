@@ -20,7 +20,7 @@ export default function HuaDepartment({ ticket_number, currentState, requested_h
   const [exclusionReasons, setExclusionReasons] = useState([]);
   const [selectedExclusionReason, setSelectedExclusionReason] = useState('');
   const session = Cookie.get("session");
-  const storedSession = JSON.parse(session);
+  const storedSession = session ? JSON.parse(session) : null;
   const [loading, setLoading] = useState(true);
   const [errorResult, setErrorResult] = useState(false);
   const navigate = useNavigate();

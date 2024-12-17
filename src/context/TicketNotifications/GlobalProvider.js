@@ -17,7 +17,7 @@ export const TicketCountProvider = ({ children }) => {
     };
     const [state, dispatch] = useReducer(ticketReducer, initialState);
     const session = Cookie.get("session");
-    const storedSession = JSON.parse(session);
+    const storedSession = session ? JSON.parse(session) : null;
 
     const fetchTicketStats = async () => {
         const cookieNameMttr = 'mttrCount';

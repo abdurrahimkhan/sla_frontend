@@ -27,13 +27,11 @@ export default function ViewTicket() {
     const [data, setData] = useState(null)
     const [ticket, setTicket] = useState(null);
     // const { data: session } = useSession();
-    const [user, setUser] = useState();
     const navigate = useNavigate();
     const { pr_id } = useParams();
-    const [searchParams] = useSearchParams();
-    const source = searchParams.get('source');
+    // const [searchParams] = useSearchParams();
     const session = Cookie.get("session");
-    const storedSession = JSON.parse(session);
+    const storedSession = session ? JSON.parse(session) : null;
 
 
 
@@ -44,7 +42,9 @@ export default function ViewTicket() {
     }, [activeTab]);
 
     useEffect(() => {
+        console.log(storedSession)
         if (storedSession) {
+            console.log("true")
             searchTicket(pr_id);
         } else {
             navigate('/');
@@ -102,7 +102,7 @@ export default function ViewTicket() {
     }
 
 
-    if (loading || !user) {
+    if (loading) {
         return (
             <FlexDiv classes='w-full h-screen'>
                 <Loader />

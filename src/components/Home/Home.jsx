@@ -18,17 +18,6 @@ const panels = [
     link: '/pending-tickets',
     icon: <IoTicketSharp className=" text-4xl font-medium" />,
   },
-  // {
-  //   name: 'Create Ticket',
-  //   link: '/dashboard#Create',
-  //   icon: <IoCreateSharp className=" text-4xl font-medium" />
-  // },
-  // {
-  //   name: 'Upload Bulk Tickets',
-  //   link: '/dashboard#Import',
-  //   icon: <IoAddCircleSharp className="text-4xl font-medium" />
-
-  // },
   {
     name: 'Calendar',
     link: '/calendar',

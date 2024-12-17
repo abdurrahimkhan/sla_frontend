@@ -19,7 +19,7 @@ const CalendarComponent = () => {
   const [endDate, setEndDate] = React.useState(null);
   const [status, setStatus] = React.useState(0);
   const session = Cookie.get("session");
-    const storedSession = JSON.parse(session);
+  const storedSession = session ? JSON.parse(session) : null;
   const [errorMessage, setErrorMessage] = React.useState('');
   const [slaDetails, setSlaDetails] = React.useState('');
   // const [errorResult, setErrorResult] = React.useState(false);
@@ -28,7 +28,7 @@ const CalendarComponent = () => {
 
 
   React.useEffect(() => {
-    if(!storedSession){
+    if (!storedSession) {
       navigate('/');
     }
     setTimeout(() => {
@@ -43,7 +43,7 @@ const CalendarComponent = () => {
     if (selectInfo.source !== 'date') {
       return;
     }
-    if(value.isAfter(today)) {
+    if (value.isAfter(today)) {
       setStatus(500);
       setErrorMessage("You entered Date greater than Today");
       return;

@@ -9,5 +9,6 @@ export const BASE_URL = 'http://localhost:8000'
 
 export const SideBarLinks = [
     '?source=ViewTicket',
-    '?source=pending'
+    '?source=pending',
+    '/view/'
 ]

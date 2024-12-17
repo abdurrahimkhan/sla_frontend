@@ -16,59 +16,33 @@ export default function Login() {
   const navigate = useNavigate();
   const session = Cookie.get("session");
 
-  const handleUsernameChange = (e) => {
-    setEmail(e.target.value);
-  }
-
   useEffect(() => {
-    if (window.location.pathname !== "/") {
-      navigate('/');
+    // Redirect if not on the login page
+    if (session || status === "authenticated") {
+      navigate("/dashboard");
     }
-    if (status === "unauthenticated") {
-      setLoading(false);
-    }
-  }, [status])
+  }, [session, status, navigate]);
 
-  useEffect(() => {
-
-    if (session) {
-      navigate(`/dashboard`);
-    }
-    else {
-      navigate('/');
-    }
-  }, [])
-
-
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-  }
+  const handleInputChange = (setter) => (e) => {
+    setter(e.target.value);
+  };
 
   const onFormSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Successful login, trigger NextAuth.js signIn
       const res = await signIn(email, password);
-      console.log('login response');
-      console.log(res);
 
       if (res?.status === 200) {
-        console.log("done login, sending to home page");
         setLoading(false);
-        navigate(`/dashboard`);
-      }
-
-      if (res?.status === 401) {
-
-        alert(res.error)
+        navigate("/dashboard");
+      } else if (res?.status === 401) {
+        alert(res.error || "Invalid credentials. Please try again.");
         setLoading(false);
       }
-
-
     } catch (error) {
-      console.log(error);
-      alert("Invalid Credentials. Please try again.")
+      console.error("Login error:", error);
+      alert("An error occurred during login. Please try again.");
       setLoading(false);
     }
 
@@ -98,12 +72,12 @@ export default function Login() {
 
 
               <div className="input-group mb-3">
-                <input onChange={handleUsernameChange} className="form-control " type="text" id="username" name="username" required
+                <input onChange={handleInputChange(setEmail)} className="form-control " type="text" id="username" name="username" required
                   placeholder="Username" />
 
               </div>
               <div className="input-group mb-3">
-                <input onChange={handlePasswordChange} className="form-control" type="password" id="password" name="password" placeholder="Password" required />
+                <input onChange={handleInputChange(setPassword)} className="form-control" type="password" id="password" name="password" placeholder="Password" required />
 
 
               </div>

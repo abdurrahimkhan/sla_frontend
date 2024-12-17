@@ -80,7 +80,7 @@ export default function SlideOver({ open, setOpen, links }) {
                           onClick={(event) => {
                             event.preventDefault();  // Prevent default behavior
                             // window.open(`https://10.23.65.30/sla/worklog/${window.location.pathname.split('/')[3]}`, '_blank'); // Open in new tab
-                            window.open(`http://localhost:3002/sla/worklog/${window.location.pathname.split('/')[3]}`, '_blank'); // Open in new tab
+                            window.open(`http://localhost:3000/sla/worklog/PR${window.location.pathname.split('PR')[1]}`, '_blank'); // Open in new tab
                           }}
                         >
                           SLA Worklog

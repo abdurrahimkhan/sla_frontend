@@ -16,7 +16,7 @@ const TicketView = ({ data }) => {
     const searchInput = useRef(null);
     const [data1, setData] = useState();
     const session = Cookie.get("session");
-    const storedSession = JSON.parse(session);
+    const storedSession = session ? JSON.parse(session) : null;
     const navigate = useNavigate();
 
     useEffect(() => {

@@ -24,7 +24,7 @@ export default function HuaNocForm({ ticket_number, Exclusion_Reason, Huawei_Rem
     const [exclusionReasons, setExclusionReasons] = useState([]);
     const [selectedExclusionReason, setSelectedExclusionReason] = useState(Exclusion_Reason);
     const session = Cookie.get("session");
-    const storedSession = JSON.parse(session); 
+    const storedSession = session ? JSON.parse(session) : null; 
     console.log(selectedExclusionReason);
     console.log(Exclusion_Reason);
 

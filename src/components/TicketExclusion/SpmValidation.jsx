@@ -21,7 +21,7 @@ export default function SpmValidation({ ticket_number, Exclusion_Reason, request
   const [exclusionReasons, setExclusionReasons] = useState([]);
   const [selectedExclusionReason, setSelectedExclusionReason] = useState(Exclusion_Reason);
   const session = Cookie.get("session");
-  const storedSession = JSON.parse(session);
+  const storedSession = session ? JSON.parse(session) : null;
   const navigate = useNavigate();
 
 

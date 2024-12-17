@@ -16,7 +16,7 @@ export default function StcNocForm({ ticket_number, currentState, requested_hour
   const [remarks, setRemarks] = useState('')
   // const { data: session } = useSession();
   const session = Cookie.get("session");
-  const storedSession = JSON.parse(session);
+  const storedSession = session ? JSON.parse(session) : null;
   const [errorResult, setErrorResult] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();

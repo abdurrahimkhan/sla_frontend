@@ -10,12 +10,10 @@ export default function PendingTicketsPage() {
   const [filterType, setFilterType] = React.useState(filter);
 
   useEffect(() => {
-    if (!filterType) {
-      if (filter) {
-        setFilterType(filter)
-      } else {
-        setFilterType('Both')
-      }
+    if (filterType) {
+      setFilterType(filter)
+    } else {
+      setFilterType('Both')
     }
 
   }, [filter])

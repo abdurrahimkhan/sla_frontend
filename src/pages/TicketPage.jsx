@@ -43,7 +43,7 @@ export default function TicketPage() {
     const [status, setStatus] = useState(0);
     const source = searchParams.get('source');
     const session = Cookie.get("session");
-    const storedSession = JSON.parse(session);
+    const storedSession = session ? JSON.parse(session) : null;
 
 
 

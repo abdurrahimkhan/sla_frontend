@@ -24,7 +24,7 @@ export default function Worklog({ setOpen, sidebarOpen, setSidebarOpen }) {
   const [status, setStatus] = useState(0);
   const [errorMessage, setErrorMessage] = useState('')
   const session = Cookie.get("session");
-  const storedSession = JSON.parse(session);
+  const storedSession = session ? JSON.parse(session) : null;
   const pr_id = window.location.pathname.split('/').pop();
   const navigate = useNavigate();
 

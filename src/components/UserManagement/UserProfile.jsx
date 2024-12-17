@@ -35,7 +35,7 @@ export default function UserProfile() {
     const [loading, setLoading] = React.useState(false);
     const [errorResult, setErrorResult] = React.useState(false);
     const session = Cookie.get("session");
-    const storedSession = JSON.parse(session);
+    const storedSession = session ? JSON.parse(session) : null;
     const [parentUser, setParentUser] = React.useState(storedSession.user.email);
     const navigate = useNavigate();
 

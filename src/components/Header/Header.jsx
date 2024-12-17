@@ -19,7 +19,7 @@ export default function Header({ setOpen, sidebarOpen, setSidebarOpen }) {
   const [logoutVisible, setLogoutVisible] = useState(false);
   const { signOut } = useAuth();
   const session = Cookie.get("session");
-  const storedSession = JSON.parse(session);
+  const storedSession = session ? JSON.parse(session) : null;
   const { mttrCount, ptlCount } = useContext(TicketCountContext);
   const [items, setItems] = useState([]);
 
@@ -59,10 +59,6 @@ export default function Header({ setOpen, sidebarOpen, setSidebarOpen }) {
   }
 
   useEffect(() => {
-    console.log("is this even working");
-    console.log(items)
-
-
     if (storedSession) {
       setUsername(storedSession.user?.email ?? '')
     }
