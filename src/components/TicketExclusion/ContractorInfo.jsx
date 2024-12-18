@@ -19,9 +19,6 @@ export default function ContractorInfo(
 
     const [status, setStatus] = useState(0);
     const [errorMessage, setErrorMessage] = useState('')
-    // const { data: session } = useSession();
-    const { session } = useAuth();
-
 
     return (
         <div className='flex flex-col gap-y-5 '>

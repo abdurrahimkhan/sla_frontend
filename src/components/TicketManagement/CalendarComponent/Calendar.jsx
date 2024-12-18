@@ -48,7 +48,6 @@ const CalendarComponent = () => {
       setErrorMessage("You entered Date greater than Today");
       return;
     }
-    console.log("hit here");
     try {
       const response = await axios.get(`${BASE_URL}/ticket/fetch-ticket-stats-by-date?date=${value.format('YYYY-MM-DD')}`, {
         headers: {

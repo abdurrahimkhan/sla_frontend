@@ -42,38 +42,40 @@ export default function UserProfile() {
 
 
     const fetchPermissions = async () => {
-        let config = {
-            method: 'get',
-            maxBodyLength: Infinity,
-            url: `${BASE_URL}/user-permissions/get-permissions-by-user-id?userID=${storedSession.user.id}`,
-            headers: {
-                'Authorization': `Bearer ${storedSession.Authorization}`,
-            }
-        };
-        axios.request(config)
-            .then((response) => {
-                console.log(JSON.stringify(response.data));
-
-                const domainPermissions = response.data
-                    .filter((perm) => perm.permission.level === 'Domain')
-                    .map((perm) => ({
-                        id: perm.permission.id,
-                        displayName: `${perm.permission.name} (${perm.permission.level})`,
-                    }));
-
-                const districtPermissions = response.data
-                    .filter((perm) => perm.permission.level === 'District')
-                    .map((perm) => ({
-                        id: perm.permission.id,
-                        displayName: `${perm.permission.name} (${perm.permission.level})`,
-                    }));
-
-                setSelectedDomainIds(domainPermissions);
-                setSelectedDistrictIds(districtPermissions);
-            })
-            .catch((error) => {
-                console.log(error);
+        try {
+            const response = await axios.get(`${BASE_URL}/user-permissions/get-permissions-by-user-id?userID=${storedSession.user.id}`, {
+                headers: {
+                    Authorization: `Bearer ${storedSession.Authorization}`,
+                },
             });
+
+            console.log(JSON.stringify(response.data));
+
+            const domainPermissions = response.data
+                .filter((perm) => perm.permission.level === 'Domain')
+                .map((perm) => ({
+                    id: perm.permission.id,
+                    displayName: `${perm.permission.name} (${perm.permission.level})`,
+                }));
+
+            const districtPermissions = response.data
+                .filter((perm) => perm.permission.level === 'District')
+                .map((perm) => ({
+                    id: perm.permission.id,
+                    displayName: `${perm.permission.name} (${perm.permission.level})`,
+                }));
+
+            setSelectedDomainIds(domainPermissions);
+            setSelectedDistrictIds(districtPermissions);
+        } catch (error) {
+            if (error.response.status === 403) {
+                setErrorMessage('Not Authorized');
+              } else if (error.response.status === 401) {
+                navigate('/');
+              } else {
+                setErrorMessage(error.response.data.message || 'Something went wrong.');
+              }
+        }
     }
 
     useEffect(() => {
@@ -82,7 +84,6 @@ export default function UserProfile() {
         } else {
             navigate('/');
         }
-
     }, [])
 
 
@@ -126,7 +127,7 @@ export default function UserProfile() {
                         <FlexDiv gapX={20}>
                             <InputContainer label='Mobile Number' >
                                 <input
-                                    disabled defaultValue={storedSession.user.mobileNumber}
+                                    disabled defaultValue={storedSession.user.mobile_phone}
                                     type='text' placeholder='Enter Mobile' className='w-full mt-2 focus:outline-none border border-stc-purple rounded-[4px] py-3 pl-4' />
                             </InputContainer>
 

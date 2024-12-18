@@ -1,17 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { MdClose } from 'react-icons/md';
-import { BASE_URL, SideBarLinks } from '../../constants/constants';
-
-
-
-function titleCase(str) {
-  return str.split(' ').map(function (word) {
-    return (word.charAt(0).toUpperCase() + word.slice(1));
-  }).join(' ');
-}
-
-
+import { SideBarLinks } from '../../constants/constants';
 
 export default function SlideOver({ open, setOpen, links }) {
   const [hasMatchingSubstring, setHasMatchingSubstring] = useState(false);

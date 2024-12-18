@@ -15,7 +15,6 @@ const TicketsTable = ({ data, searchTicket }) => {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
-  // const router = useRouter();
   const navigate = useNavigate();
 
   const handleSearch = (
@@ -275,7 +274,7 @@ const TicketsTable = ({ data, searchTicket }) => {
       ...getColumnSearchProps('Last_Modified_Date'),
     },
     {
-      title: 'Last_Modified_By',
+      title: 'Last Modified By',
       dataIndex: 'Last_Modified_By',
       key: 'Last_Modified_By',
       ...getColumnSearchProps('Last_Modified_By'),

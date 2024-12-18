@@ -22,22 +22,6 @@ const navItems = [
         text: 'Search',
         link: '/search-ticket'
     },
-    // {
-    //     icon: <IoTicketOutline className="text-white text-2xl font-thin" />,
-    //     text: 'View'
-    // },
-    // {
-    //     icon: <IoCalendarOutline className="text-white text-2xl font-thin" />,
-    //     text: 'Calendar'
-    // },
-    // {
-    //     icon: <IoCreateOutline className="text-white text-2xl font-thin" />,
-    //     text: 'Create'
-    // },
-    // {
-    //     icon: <IoAddCircleOutline className="text-white text-2xl font-thin" />,
-    //     text: 'Import'
-    // },
     {
         icon: <FaTable className="text-white text-2xl font-thin" />,
         text: 'All Closed Tickets',

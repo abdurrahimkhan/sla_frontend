@@ -1,4 +1,3 @@
-import useAuth from '../auth/useAuth';
 import BaseLayout from '../components/BaseLayout/BaseLayout'
 import CollapseComponent from '../components/Common/Collapse';
 import Container from '../components/Common/Container';
@@ -6,7 +5,6 @@ import ErrorResult from '../components/Common/ErrorResult';
 import FlexDiv from '../components/Common/FlexDiv';
 import Loader from '../components/Common/Loader';
 import ContractorInfo from '../components/TicketExclusion/ContractorInfo';
-import StcNocForm from '../components/TicketExclusion/StcNocForm';
 import StcNocInfo from '../components/TicketExclusion/StcNocInfo';
 import StcRegionalInfo from '../components/TicketExclusion/StcRegionalInfo';
 import StcRegionalForm from '../components/TicketExclusion/StcRegionalForm';
@@ -26,10 +24,8 @@ export default function ViewTicket() {
     const [errorMessage, setErrorMessage] = useState('')
     const [data, setData] = useState(null)
     const [ticket, setTicket] = useState(null);
-    // const { data: session } = useSession();
     const navigate = useNavigate();
     const { pr_id } = useParams();
-    // const [searchParams] = useSearchParams();
     const session = Cookie.get("session");
     const storedSession = session ? JSON.parse(session) : null;
 

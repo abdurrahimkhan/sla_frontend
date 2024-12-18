@@ -1,214 +1,171 @@
-import React, { useContext, useState, useEffect } from 'react'
-import FlexDiv from '../Common/FlexDiv'
-// import { useSession } from 'next-auth/react';
+import React, { useState, useEffect } from 'react';
+import FlexDiv from '../Common/FlexDiv';
 import axios from 'axios';
 import ErrorModal from '../Common/ErrorModal';
 import SuccessModal from '../Common/SuccessModal';
-import useAuth from '../../auth/useAuth';
 import { BASE_URL } from '../../constants/constants';
 import { useNavigate } from 'react-router-dom';
 import ErrorResult from '../Common/ErrorResult';
-import Cookie from "js-cookie";
+import Cookie from 'js-cookie';
 
 export default function HuaDepartment({ ticket_number, currentState, requested_hours }) {
   const [exclusionTime, setExclusionTime] = useState(parseFloat(requested_hours));
-  const [status, setStatus] = useState(0);
-  const [errorMessage, setErrorMessage] = useState('')
-  const [remarks, setRemarks] = useState('')
-  // const { data: session } = useSession();
-  const { signOut } = useAuth();
+  const [remarks, setRemarks] = useState('');
   const [exclusionReasons, setExclusionReasons] = useState([]);
   const [selectedExclusionReason, setSelectedExclusionReason] = useState('');
-  const session = Cookie.get("session");
+  const [errorMessage, setErrorMessage] = useState('');
+  const [status, setStatus] = useState(null); // `status` can be simplified
+  const session = Cookie.get('session');
   const storedSession = session ? JSON.parse(session) : null;
-  const [loading, setLoading] = useState(true);
-  const [errorResult, setErrorResult] = useState(false);
   const navigate = useNavigate();
 
-
-  const submitTicket = async () => {
-    if (storedSession) {
-      if (exclusionTime > 0 && remarks !== '') {
-        try {
-          const response = await axios.put(
-            `${BASE_URL}/ticket/ticket-exclusion-submission`,
-            {
-              ticketId: ticket_number,
-              exclusionReason: selectedExclusionReason,
-              exclusionTime: exclusionTime,
-              huaweiRemarks: remarks,
-              user: storedSession.user.email
-            },
-            {
-              headers: {
-                'Authorization': `Bearer ${storedSession.Authorization}`,
-                'Content-Type': 'application/json'
-              }
-            }
-          );
-          console.log(response);
-          setStatus(200);
-        } catch (error) {
-          if (error.response.status == 403) {
-            setErrorMessage("Not Authorized");
-            setErrorResult(true);
-            setLoading(false);
-          }
-          else if (error.response.status == 401) {
-            navigate("/");
-          } else {
-            setErrorMessage(error.response.data.message);
-            setErrorResult(true);
-            setLoading(false);
-          }
-        }
-
-
-
-
-        // let config = {
-        //   method: 'put',
-        //   maxBodyLength: Infinity,
-        //   url: `${BASE_URL}/ticket/ticket-exclusion-submission`,
-        //   headers: {
-        //     'Authorization': `Bearer ${storedSession.Authorization}`,
-        //     'Content-Type': 'application/json'
-        //   },
-        //   data: JSON.stringify({
-        //     ticketId: ticket_number,
-        //     exclusionReason: selectedExclusionReason,
-        //     exclusionTime: exclusionTime,
-        //     huaweiRemarks: remarks,
-        //     user: storedSession.user.email,
-        //   })
-        // };
-
-        // axios.request(config)
-        //   .then((response) => {
-        //     console.log(response);
-
-        //     setStatus(200);
-        //   })
-        //   .catch((error) => {
-        //     console.log(error);
-        //     if (error.response.status == 403) {
-        //       alert("Session expired, Kindly Login Again.");
-        //       signOut();
-        //     }
-        //     setErrorMessage(error.response.data)
-        //     setErrorResult(true)
-        //     setLoading(false)
-        //   });
-
-      } else {
-        setErrorMessage('Please add remarks and exclusion time.')
-        setStatus(500)
-      }
-    } else {
-      navigate('/');
-    }
-  }
-
+  // Fetch exclusion reasons on component mount
   useEffect(() => {
-
     if (storedSession) {
-      const fetchData = async () => {
+      const fetchExclusionReasons = async () => {
         try {
-          const response = await axios.get(`${BASE_URL}/exclusion-reason/fetch-all`,
-            {
-              headers: {
-                Authorization: `Bearer ${storedSession.Authorization}`,
-                'Content-Type': 'application/json'
-              }
-            }
-          );
-
-          console.log(response);
-          // datasource db {
-          //   provider = "sqlserver"
-          //   url      = env("DATABASE_URL")
-          // }
-          // DATABASE_URL="sqlserver://localhost:1433;database=sla;user=sla_user;password=huawei123;encrypt=true;trustServerCertificate=true;"
-
-          // const response = {
-          //   1: "Accessibility - Limited Business Hours (Region)",
-          //   2: "Accessibility - Pre-Access Permit Required(Region)",
-          //   3: "Spare Parts - Limited stock (Region)",
-          //   4: "Planned Activities - Within Approved window (NOC)",
-          //   5: "Main AC Power Loss - SEC Blackout (NOC)",
-          //   6: "Fault Beyond MSP Scope Responsibility - External Operation Organization(NOC)",
-          //   7: "Spare Parts - Limited stock",
-          //   8: "Spare Parts - zero stock"
-          // }
-
-          const ERArray = response.data.map(item => ({
+          const response = await axios.get(`${BASE_URL}/exclusion-reason/fetch-all`, {
+            headers: {
+              Authorization: `Bearer ${storedSession.Authorization}`,
+              'Content-Type': 'application/json',
+            },
+          });
+          const formattedExclusionReasons = response.data.map(item => ({
             id: item.id,
             value: item.exclusion_reason,
             label: `${item.exclusion_reason} (${item.region_noc})`,
           }));
-          // const ERArray = Object.entries(response.data).map(([key, value, region]) => ({
-          //   id: key,
-          //   label: value + '(' + region + ')',
-          // }));
-          setExclusionReasons(ERArray); // Assuming data is an array
+          setExclusionReasons(formattedExclusionReasons);
         } catch (error) {
-          console.error('Error fetching data:', error);
+          setErrorMessage('Error fetching exclusion reasons');
+          setStatus(500);
         }
       };
-
-      fetchData();
+      fetchExclusionReasons();
+    } else {
+      navigate('/');
     }
-  }, [])
+  }, [storedSession, navigate]);
 
-  const handleChange = (event) => {
-    setSelectedExclusionReason(event.target.value);
+  const handleExclusionTimeChange = (e) => {
+    setExclusionTime(parseFloat(e.target.value));
   };
 
+  const handleExclusionReasonChange = (e) => {
+    setSelectedExclusionReason(e.target.value);
+  };
 
+  const handleRemarksChange = (e) => {
+    setRemarks(e.target.value);
+  };
+
+  const submitTicket = async () => {
+    if (storedSession && exclusionTime > 0 && remarks) {
+      try {
+        const response = await axios.put(
+          `${BASE_URL}/ticket/ticket-exclusion-submission`,
+          {
+            ticketId: ticket_number,
+            exclusionReason: selectedExclusionReason,
+            exclusionTime,
+            huaweiRemarks: remarks,
+            user: storedSession.user.email,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${storedSession.Authorization}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        setStatus(200);
+      } catch (error) {
+        handleError(error);
+      }
+    } else {
+      setErrorMessage('Please add remarks and exclusion time.');
+      setStatus(500);
+    }
+  };
+
+  const handleError = (error) => {
+    if (error.response) {
+      if (error.response.status === 403) {
+        setErrorMessage('Not Authorized');
+      } else if (error.response.status === 401) {
+        navigate('/');
+      } else {
+        setErrorMessage(error.response.data.message || 'Something went wrong');
+      }
+    } else {
+      setErrorMessage('Network error. Please try again later.');
+    }
+    setStatus(500);
+  };
 
   return (
-    <div className='flex flex-col gap-y-5 '>
-      {
-        errorResult ?
-          <FlexDiv classes='mt-[12%]'>
-            <ErrorResult text={errorMessage} onClick={() => navigate('/dashboard')} />
-          </FlexDiv> :
-          <>
-            <FlexDiv justify='space-between' classes='border-b border-stc-black'>
-              <span className='font-medium'>Exclusion Time Requested</span>
-              <input defaultValue={exclusionTime} max={exclusionTime} min={1} onChange={(e) => setExclusionTime(parseFloat(e.target.value))} type='number' className='focus:outline-none border border-slate-400 px-2 py-1 border-opacity-40 rounded-sm ' />
-            </FlexDiv>
+    <div className="flex flex-col gap-y-5">
+      {status === 500 && errorMessage && (
+        <FlexDiv classes="mt-[12%]">
+          <ErrorResult text={errorMessage} onClick={() => navigate('/dashboard')} />
+        </FlexDiv>
+      )}
 
-            <FlexDiv justify='space-between' classes='border-b border-stc-black'>
-              <span className='font-medium'>Exclusion Reason</span>
-              <select id="my-dropdown" value={selectedExclusionReason} onChange={handleChange} className='focus:outline-none border max-w-[260px] w-full border-slate-400 px-2 py-1 border-opacity-40 rounded-sm '>
-                <option value="" disabled>Select one</option>
-                {exclusionReasons.map((exclusionReason) => (
-                  <option key={exclusionReason.id} value={exclusionReason.value}>
-                    {exclusionReason.label}
-                  </option>
-                ))}
-              </select>
-            </FlexDiv>
+      {status === 200 && (
+        <SuccessModal heading="Success" body="Ticket submitted successfully" open={status === 200} close={() => navigate('/dashboard#Home')} />
+      )}
 
+      {/* Exclusion Time Field */}
+      <FlexDiv justify="space-between" classes="border-b border-stc-black">
+        <span className="font-medium">Exclusion Time Requested</span>
+        <input
+          type="number"
+          min={1}
+          max={exclusionTime}
+          value={exclusionTime}
+          onChange={handleExclusionTimeChange}
+          className="focus:outline-none border border-slate-400 px-2 py-1 border-opacity-40 rounded-sm"
+        />
+      </FlexDiv>
 
-            <FlexDiv justify='space-between' classes='border-b border-stc-black'>
-              <span className='font-medium'>Remarks</span>
-              <textarea onChange={(e) => setRemarks(e.target.value)} className='focus:outline-none border border-slate-400 rounded-sm h-24 w-3/4 px-2 py-1' ></textarea>
-            </FlexDiv>
+      {/* Exclusion Reason Dropdown */}
+      <FlexDiv justify="space-between" classes="border-b border-stc-black">
+        <span className="font-medium">Exclusion Reason</span>
+        <select
+          value={selectedExclusionReason}
+          onChange={handleExclusionReasonChange}
+          className="focus:outline-none border max-w-[260px] w-full border-slate-400 px-2 py-1 border-opacity-40 rounded-sm"
+        >
+          <option value="" disabled>
+            Select one
+          </option>
+          {exclusionReasons.map((exclusionReason) => (
+            <option key={exclusionReason.id} value={exclusionReason.value}>
+              {exclusionReason.label}
+            </option>
+          ))}
+        </select>
+      </FlexDiv>
 
-            <FlexDiv justify='space-between' classes='border-b border-stc-black'>
-              <div>
-                <span className='font-medium'>Submit to SPOC</span>
-              </div>
-              <button onClick={submitTicket} className='bg-stc-green shadow-lg text-white py-2 px-3 rounded-md'>Submit</button>
-            </FlexDiv>
+      {/* Remarks Field */}
+      <FlexDiv justify="space-between" classes="border-b border-stc-black">
+        <span className="font-medium">Remarks</span>
+        <textarea
+          value={remarks}
+          onChange={handleRemarksChange}
+          className="focus:outline-none border border-slate-400 rounded-sm h-24 w-3/4 px-2 py-1"
+        />
+      </FlexDiv>
 
-            {status === 200 && <SuccessModal heading='Success' body={'TT submitted successfully'} open={status === 200} close={() => window.location.href = '/dashboard#Home'} />}
-
-            {status === 500 && <ErrorModal heading='Something went wrong!' body={errorMessage} open={status === 500} close={() => setStatus(0)} />}
-          </>
-      }
+      {/* Submit Button */}
+      <FlexDiv justify="space-between" classes="border-b border-stc-black">
+        <div>
+          <span className="font-medium">Submit to SPOC</span>
+        </div>
+        <button onClick={submitTicket} className="bg-stc-green shadow-lg text-white py-2 px-3 rounded-md">
+          Submit
+        </button>
+      </FlexDiv>
     </div>
-  )
+  );
 }

@@ -1,129 +1,148 @@
-import React, { useContext, useEffect, useState } from 'react'
-import FlexDiv from '../Common/FlexDiv'
-// import { useSession } from 'next-auth/react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import ErrorModal from '../Common/ErrorModal';
-import SuccessModal from '../Common/SuccessModal';
-import useAuth from '../../auth/useAuth';
 import { BASE_URL } from '../../constants/constants';
 import { useNavigate } from 'react-router-dom';
-import Cookie from "js-cookie";
+import Cookie from 'js-cookie';
+import FlexDiv from '../Common/FlexDiv';
+import ErrorModal from '../Common/ErrorModal';
+import SuccessModal from '../Common/SuccessModal';
 
 export default function StcNocForm({ ticket_number, currentState, requested_hours }) {
-  const [acceptedExculsionTime, setAcceptedExclusionTime] = useState(parseFloat(requested_hours));
+  const [acceptedExclusionTime, setAcceptedExclusionTime] = useState(parseFloat(requested_hours));
+  const [remarks, setRemarks] = useState('');
   const [status, setStatus] = useState(0);
-  const [errorMessage, setErrorMessage] = useState('')
-  const [remarks, setRemarks] = useState('')
-  // const { data: session } = useSession();
-  const session = Cookie.get("session");
+  const [errorMessage, setErrorMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const session = Cookie.get('session');
   const storedSession = session ? JSON.parse(session) : null;
-  const [errorResult, setErrorResult] = useState(false);
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-
-
-  const acceptTicket = async () => {
-    if (acceptedExculsionTime > 0 && remarks !== '') {
-      try {
-        const response = await axios.put(`${BASE_URL}/ticket/ticket-stc-governance-accept`,
-          {
-            ticketId: ticket_number,
-            acceptedTime: acceptedExculsionTime,
-            remarks: remarks,
-            user: storedSession.user.email,
-          },
-          {
-            headers: {
-              'Authorization': `Bearer ${storedSession.Authorization}`,
-              'Content-Type': 'application/json'
-            }
-          });
-        console.log(response);
-        setStatus(200);
-      } catch (error) {
-        if (error.response.status == 403) {
-          setErrorMessage("Not Authorized");
-          setErrorResult(true);
-          setLoading(false);
-        }
-        else if (error.response.status == 401) {
-          navigate("/");
-        } else {
-          setErrorMessage(error.response.data.message);
-          setErrorResult(true);
-          setLoading(false);
-        }
-      }
-
-    } else {
-      setErrorMessage('Please add remarks and exclusion time.')
-      setStatus(500)
-    }
-
-  }
-
-
-  const rejectTicket = async () => {
-
-    if (remarks !== '') {
-      const res = await axios.put(
-        `${BASE_URL}/ticket/ticket-stc-governance-reject`,
-        {
-          ticketId: ticket_number,
-          remarks: remarks,
-          acceptedTime: 0,
-          user: storedSession.user.email,
+  // Helper function for API calls
+  const handleTicketAction = async (actionType, payload) => {
+    setLoading(true);
+    try {
+      const response = await axios.put(`${BASE_URL}/ticket/${actionType}`, payload, {
+        headers: {
+          Authorization: `Bearer ${storedSession.Authorization}`,
+          'Content-Type': 'application/json',
         },
-        {
-          headers: {
-            Authorization: `Bearer ${storedSession.Authorization}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
+      });
 
-      setStatus(200);
-    } else {
-      setErrorMessage('Please add remarks')
-      setStatus(500)
+      setStatus(200); // Success status
+    } catch (error) {
+      console.error(error);
+      const message = error.response?.data?.message || 'Something went wrong!';
+      setErrorMessage(message);
+      setStatus(500); // Error status
+    } finally {
+      setLoading(false);
     }
+  };
 
-  }
+  // Handle accept ticket
+  const acceptTicket = () => {
+    if (acceptedExclusionTime > 0 && remarks) {
+      const payload = {
+        ticketId: ticket_number,
+        acceptedTime: acceptedExclusionTime,
+        remarks,
+        user: storedSession.user.email,
+      };
+      handleTicketAction('ticket-stc-governance-accept', payload);
+    } else {
+      setErrorMessage('Please add remarks and exclusion time.');
+      setStatus(500);
+    }
+  };
 
+  // Handle reject ticket
+  const rejectTicket = () => {
+    if (remarks) {
+      const payload = {
+        ticketId: ticket_number,
+        remarks,
+        acceptedTime: 0,
+        user: storedSession.user.email,
+      };
+      handleTicketAction('ticket-stc-governance-reject', payload);
+    } else {
+      setErrorMessage('Please add remarks');
+      setStatus(500);
+    }
+  };
+
+  // Ensure session is available
   useEffect(() => {
     if (!storedSession) {
-      navigate("/");
+      navigate('/');
     }
-  }, [])
+  }, [storedSession, navigate]);
 
   return (
-    <div className='flex flex-col gap-y-5 '>
-      <FlexDiv justify='space-between' classes='border-b border-stc-black'>
-        <span className='font-medium'>Reject Request</span>
-        <button onClick={rejectTicket} className='bg-stc-red shadow-lg text-white py-2 px-3 rounded-md'>Reject</button>
+    <div className="flex flex-col gap-y-5">
+      <FlexDiv justify="space-between" classes="border-b border-stc-black">
+        <span className="font-medium">Reject Request</span>
+        <button
+          onClick={rejectTicket}
+          className="bg-stc-red shadow-lg text-white py-2 px-3 rounded-md"
+          disabled={loading}
+        >
+          Reject
+        </button>
       </FlexDiv>
 
-
-      <FlexDiv justify='space-between' classes='border-b border-stc-black'>
-        <span className='font-medium'>Approved Requested Time</span>
-        <input defaultValue={acceptedExculsionTime} max={acceptedExculsionTime} min={1} onChange={(e) => setAcceptedExclusionTime(parseFloat(e.target.value))} type='number' className='focus:outline-none border border-slate-400 px-2 py-1 border-opacity-40 rounded-sm ' />
+      <FlexDiv justify="space-between" classes="border-b border-stc-black">
+        <span className="font-medium">Approved Requested Time</span>
+        <input
+          value={acceptedExclusionTime}
+          max={acceptedExclusionTime}
+          min={1}
+          onChange={(e) => setAcceptedExclusionTime(parseFloat(e.target.value))}
+          type="number"
+          className="focus:outline-none border border-slate-400 px-2 py-1 border-opacity-40 rounded-sm"
+          disabled={loading}
+        />
       </FlexDiv>
 
-      <FlexDiv justify='space-between' classes='border-b border-stc-black'>
-        <span className='font-medium'>Remarks</span>
-        <textarea onChange={(e) => setRemarks(e.target.value)} className='focus:outline-none border border-slate-400 rounded-sm h-24 w-3/4 px-2 py-1' ></textarea>
+      <FlexDiv justify="space-between" classes="border-b border-stc-black">
+        <span className="font-medium">Remarks</span>
+        <textarea
+          onChange={(e) => setRemarks(e.target.value)}
+          className="focus:outline-none border border-slate-400 rounded-sm h-24 w-3/4 px-2 py-1"
+          disabled={loading}
+        ></textarea>
       </FlexDiv>
-      <FlexDiv justify='space-between' classes='border-b border-stc-black'>
+
+      <FlexDiv justify="space-between" classes="border-b border-stc-black">
         <div>
-          <span className='font-medium'>Approve Request</span>
+          <span className="font-medium">Approve Request</span>
         </div>
-        <button onClick={acceptTicket} className='bg-stc-green shadow-lg text-white py-2 px-3 rounded-md'>Approve</button>
+        <button
+          onClick={acceptTicket}
+          className="bg-stc-green shadow-lg text-white py-2 px-3 rounded-md"
+          disabled={loading}
+        >
+          Approve
+        </button>
       </FlexDiv>
 
-      {status === 200 && <SuccessModal heading='Success' body={'Response submitted successfully'} open={status === 200} close={() => window.location.href = '/dashboard#Home'} />}
+      {status === 200 && (
+        <SuccessModal
+          heading="Success"
+          body="Response submitted successfully"
+          open={status === 200}
+          close={() => navigate('/dashboard#Home')}
+        />
+      )}
 
-      {status === 500 && <ErrorModal heading='Something went wrong!' body={errorMessage} open={status === 500} close={() => setStatus(0)} />}
+      {status === 500 && (
+        <ErrorModal
+          heading="Something went wrong!"
+          body={errorMessage}
+          open={status === 500}
+          close={() => setStatus(0)}
+        />
+      )}
     </div>
-  )
+  );
 }
